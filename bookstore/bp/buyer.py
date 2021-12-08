@@ -89,4 +89,4 @@ def add_funds():
         "WHERE uid = ?;"
         , [add_value, user_id])
     cur.close()
-    return code 
+    return '充值成功', code 
