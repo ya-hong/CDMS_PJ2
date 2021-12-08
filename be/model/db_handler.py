@@ -16,7 +16,9 @@ class DB_handler:
             UID VARCHAR(255) PRIMARY KEY, \
             PWD TEXT NOT NULL, \
             SHOP_ID VARCHAR(255) NOT NULL, \
-            BALANCE FLOAT NOT NULL\
+            BALANCE FLOAT NOT NULL, \
+            TOKEN TEXT, \
+            TERMINAL TEXT \
             )\
             ",
             " CREATE TABLE IF NOT EXISTS SHOPS ( \
@@ -58,7 +60,7 @@ class DB_handler:
             " CREATE TABLE IF NOT EXISTS ORDER_BOOK (\
             ORDER_ID TEXT, \
             BOOK_ID TEXT NOT NULL,\
-            PRIMARY KEY(ORDER_ID, BOOK_ID),\
+            PRIMARY KEY (ORDER_ID, BOOK_ID),\
             FOREIGN KEY (ORDER_ID)\
             REFERENCES ORDERS (ORDER_ID)\
             ON UPDATE CASCADE ON DELETE CASCADE,\
