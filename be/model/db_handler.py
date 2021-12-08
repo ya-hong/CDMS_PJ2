@@ -7,25 +7,25 @@ from configparser import ConfigParser
 class DB_handler:
     def __init__(self):
         self.section = "postgresql"
-        self.config_path = "database.ini"
+        self.config_path = "../sql/database.ini"
         self.init_tables()
 
     def init_tables(self):
         commands = (
-            "CREATE TABLE USERS ( \
+            "CREATE TABLE IF NOT EXISTS USERS ( \
             UID VARCHAR(255) PRIMARY KEY, \
             PWD TEXT NOT NULL, \
             SHOP_ID VARCHAR(255) NOT NULL, \
             BALANCE FLOAT NOT NULL\
             )\
             ",
-            " CREATE TABLE SHOPS ( \
+            " CREATE TABLE IF NOT EXISTS SHOPS ( \
             SHOP_ID VARCHAR(255) PRIMARY KEY, \
             UID VARCHAR(255) NOT NULL, \
             RANKING INTEGER\
             )\
             ",
-            " CREATE TABLE BOOKS ( \
+            " CREATE TABLE IF NOT EXISTS BOOKS ( \
             BOOK_ID VARCHAR(255) PRIMARY KEY, \
             UID VARCHAR(255) NOT NULL, \
             SHOP_ID VARCHAR(255) NOT NULL, \
@@ -47,8 +47,9 @@ class DB_handler:
             tags TEXT\
             )\
             ",
-            " CREATE TABLE ORDERS (\
-            ORDER_ID VARCHAR(255) PRIMARY KEY,\
+            " CREATE TABLE IF NOT EXISTS ORDERS (\
+            ORDER_ID VARCHAR(255) PRIMARY KEY, \
+            OID VARCHAR(255) NOT NULL, \
             UID VARCHAR(255) NOT NULL,\
             SHOP_ID VARCHAR(255) NOT NULL, \
             BOOK_ID VARCHAR(255) NOT NULL,\
@@ -56,36 +57,51 @@ class DB_handler:
             ORDER_QUANTITY INTEGER NOT NULL,\
             CURRENT_STATE INTEGER NOT NULL\
             )\
-            ",
-            "ALTER TABLE USERS \
-            ADD FOREIGN KEY (SHOP_ID) \
-            REFERENCES SHOPS(SHOP_ID) \
-            ",
-            "ALTER TABLE SHOPS \
-            ADD FOREIGN KEY (UID) \
-            REFERENCES USERS(UID) \
-            ",
-            "ALTER TABLE BOOKS\
-            ADD FOREIGN KEY (UID)\
-            REFERENCES USERS(UID),\
-            ADD FOREIGN KEY (SHOP_ID)\
-            REFERENCES SHOPS(SHOP_ID)\
-            ",
-            "ALTER TABLE ORDERS\
-            ADD FOREIGN KEY (UID)\
-            REFERENCES USERS(UID),\
-            ADD FOREIGN KEY (SHOP_ID)\
-            REFERENCES SHOPS(SHOP_ID),\
-            ADD FOREIGN KEY (BOOK_ID)\
-            REFERENCES BOOKS(BOOK_ID)\
             "
         )
+        fk_commands = ("ALTER TABLE USERS \
+                        ADD FOREIGN KEY (SHOP_ID) \
+                        REFERENCES SHOPS(SHOP_ID) \
+                        ",
+                       "ALTER TABLE SHOPS \
+                        ADD FOREIGN KEY (UID) \
+                        REFERENCES USERS(UID) \
+                        ",
+                       "ALTER TABLE BOOKS\
+                        ADD FOREIGN KEY (UID)\
+                        REFERENCES USERS(UID),\
+                        ADD FOREIGN KEY (SHOP_ID)\
+                        REFERENCES SHOPS(SHOP_ID)\
+                        ",
+                       "ALTER TABLE ORDERS\
+                        ADD FOREIGN KEY (UID)\
+                        REFERENCES USERS(UID),\
+                        ADD FOREIGN KEY (SHOP_ID)\
+                        REFERENCES SHOPS(SHOP_ID),\
+                        ADD FOREIGN KEY (BOOK_ID)\
+                        REFERENCES BOOKS(BOOK_ID)\
+                        ")
         try:
             conn = self.db_connect()
             cur = conn.cursor()
             for command in commands:
                 cur.execute(command)
-            cur.close
+            cur.execute("SELECT\
+                        tc.constraint_name, tc.table_name, kcu.column_name, \
+                        ccu.table_name AS foreign_table_name,\
+                        ccu.column_name AS foreign_column_name \
+                        FROM \
+                        information_schema.table_constraints AS tc \
+                        JOIN information_schema.key_column_usage AS kcu\
+                        ON tc.constraint_name = kcu.constraint_name\
+                        JOIN information_schema.constraint_column_usage AS ccu\
+                        ON ccu.constraint_name = tc.constraint_name\
+                        WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='users' ")
+            print(cur.rowcount)
+            if cur.rowcount == 0:
+                for command in fk_commands:
+                    cur.execute(command)
+            cur.close()
             conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
