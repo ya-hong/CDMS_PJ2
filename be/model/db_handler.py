@@ -64,6 +64,9 @@ class DB_handler:
             FOREIGN KEY (ORDER_ID)\
             REFERENCES ORDERS (ORDER_ID)\
             ON UPDATE CASCADE ON DELETE CASCADE,\
+            FOREIGN KEY (BOOK_ID)\
+            REFERENCES BOOKS (BOOK_ID)\
+            ON UPDATE CASCADE ON DELETE CASCADE,\
             ORDER_QUANTITY INTEGER NOT NULL\
             )\
             "
@@ -87,8 +90,6 @@ class DB_handler:
                         REFERENCES USERS(UID),\
                         ADD FOREIGN KEY (SHOP_ID)\
                         REFERENCES SHOPS(SHOP_ID),\
-                        ADD FOREIGN KEY (BOOK_ID)\
-                        REFERENCES BOOKS(BOOK_ID)\
                         ")
         try:
             conn = self.db_connect()
