@@ -26,7 +26,7 @@ class DB_handler:
             )\
             ",
             " CREATE TABLE IF NOT EXISTS BOOKS ( \
-            BOOK_ID VARCHAR(255) PRIMARY KEY, \
+            BOOK_ID TEXT PRIMARY KEY, \
             UID VARCHAR(255) NOT NULL, \
             SHOP_ID VARCHAR(255) NOT NULL, \
             QUANTITY INTEGER NOT NULL, \
@@ -48,14 +48,21 @@ class DB_handler:
             )\
             ",
             " CREATE TABLE IF NOT EXISTS ORDERS (\
-            ORDER_ID VARCHAR(255) PRIMARY KEY, \
-            OID VARCHAR(255) NOT NULL, \
+            ORDER_ID TEXT PRIMARY KEY, \
             UID VARCHAR(255) NOT NULL,\
             SHOP_ID VARCHAR(255) NOT NULL, \
-            BOOK_ID VARCHAR(255) NOT NULL,\
             ORDER_TIME TEXT NOT NULL, \
-            ORDER_QUANTITY INTEGER NOT NULL,\
             CURRENT_STATE INTEGER NOT NULL\
+            )\
+            ",
+            " CREATE TABLE IF NOT EXISTS ORDER_BOOK (\
+            ORDER_ID TEXT, \
+            BOOK_ID TEXT NOT NULL,\
+            PRIMARY KEY(ORDER_ID, BOOK_ID),\
+            FOREIGN KEY (ORDER_ID)\
+            REFERENCES ORDERS (ORDER_ID)\
+            ON UPDATE CASCADE ON DELETE CASCADE,\
+            ORDER_QUANTITY INTEGER NOT NULL\
             )\
             "
         )
