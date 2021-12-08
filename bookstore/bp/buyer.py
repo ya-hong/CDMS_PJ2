@@ -1,11 +1,10 @@
-from os import times
 from flask import Blueprint
 from flask import request
 import flask
-from flask.scaffold import _matching_loader_thinks_module_is_package
 from be.model.db_handler import DB_handler 
 from bookstore import error
 from bookstore.error import ErrorCode
+import uuid
 
 
 
@@ -35,9 +34,14 @@ def new_order():
     if code != 200:
         cur.close()
         return error.message(code)
-    cur.execute("SELECT MAX(oid) FROM orders")
-    row = cur.fetchone()
-    oid = 0 if row is None else row[0] + 1
+
+    order_id = "{}_{}_{}".format(user_id, store_id, str(uuid.uuid1()))
+    cur.execute(
+        "INSERT INTO orders(ORDER_ID, UID, SHOP_ID, ORDER_TIME, CURRENT_STATE)"
+        "VALUES(?, ?, ?, ?, ?);",
+        [order_id, user_id, store_id, 1, 1]
+    )
+    
     for book in books:
         book_id = book['id']
         buy_count = book['count']
@@ -46,12 +50,13 @@ def new_order():
             "WHERE book_id = ?;"
             , [buy_count, book_id])
         cur.execute(
-            "INSERT INTO orders(oid, UID, SHOP_ID, BOOK_ID, ORDER_QUANTITY) "
-            "VALUES(?, ?, ?, ?, ?, ?);",
-            [oid, user_id, store_id, book_id, buy_count]
+            "INSERT INTO ORDER_BOOK(order_id, BOOK_ID, ORDER_QUANTITY) "
+            "VALUES(?, ?, ?);",
+            [order_id, book_id, buy_count]
         )
     cur.close()
-    return {'order_id': oid}, 200
+    conn.commit()
+    return {'order_id': order_id}, 200
 
 
 @bp.route('/payment', ['POST'])
@@ -63,8 +68,42 @@ def payment():
     user_id = params['user_id']
     order_id = params['order_id']
     password = params['password']
+    code = 200
     # TODO: 权限检查
-    pass
+    cur = conn.cursor()
+    
+    cur.execute(
+        "SELECT SUM(books.price * order_book.order_quantity) "
+        "FROM books join order_book in books.book_id = order_book.book_id "
+        "WHERE order_id = ? ;",
+        [order_id]
+    )
+    result = cur.fetchone()
+    if result is None:
+        code = ErrorCode.INVAILD_PARAMS
+    else:
+        value = result[0]
+        cur.execute("LOCK TABLE users IN ACCESS EXCLUSIVE MODE;")
+        cur.execute("SELECT balance FROM users where uid = ?", [user_id])
+        if cur.fetchone()[0] < value:
+            code = ErrorCode.INSUFFICIENT_BALANCE
+        else:
+            cur.execute(
+                "UPDATE users SET BALANCE = BALANCE - ? "
+                "WHERE uid = ?;"
+                , [value, user_id]
+            )
+            cur.execute(
+                "DELETE FROM orders WHERE order_id = ?;",
+                [order_id]
+            )
+            cur.execute(
+                "DELETE FROM order_book WHERE order_id = ?;",
+                [order_id]
+            )
+    cur.close()
+    conn.commit()
+    return error.message(code)
 
 
 @bp.route("/add_funds", ["POST"])
