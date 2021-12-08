@@ -1,3 +1,4 @@
+import sys
 from flask import Blueprint
 from flask import request
 import flask
@@ -11,7 +12,7 @@ import uuid
 bp = Blueprint('buyer', __name__, url_prefix = "/buyer")
 conn = DB_handler().db_connect()
 
-@bp.route('/new_order', ['POST'])
+@bp.route('/new_order', methods = ['POST'])
 def new_order():
     params = request.json
     user_id = params["user_id"]
@@ -59,7 +60,7 @@ def new_order():
     return {'order_id': order_id}, 200
 
 
-@bp.route('/payment', ['POST'])
+@bp.route('/payment', methods = ['POST'])
 #   "user_id": "buyer_id",
 #   "order_id": "order_id",
 #   "password": "password"
@@ -106,7 +107,7 @@ def payment():
     return error.message(code)
 
 
-@bp.route("/add_funds", ["POST"])
+@bp.route("/add_funds", methods = ["POST"])
 # "user_id": "user_id",
 # "password": "password",
 # "add_value": 10

@@ -2,12 +2,14 @@
 
 import psycopg2
 from configparser import ConfigParser
+import os
 
 
 class DB_handler:
     def __init__(self):
         self.section = "postgresql"
-        self.config_path = "../sql/database.ini"
+        print(os.getcwd())
+        self.config_path = "be/model/database.ini"
         self.init_tables()
 
     def init_tables(self):
