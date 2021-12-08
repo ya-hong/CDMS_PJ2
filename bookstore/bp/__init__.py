@@ -1,3 +1,5 @@
 #!/usr/bin/env python3
 
-from bp import auth, buyer, seller
+__all__ = ['auth', 'buyer', 'seller']
+
+from bp import *
