@@ -1,4 +1,4 @@
-from db_handler import *
+from be.model.db_handler import *
 import psycopg2
 
 
