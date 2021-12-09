@@ -1,22 +1,27 @@
+import os
 import sys
 sys.path.append('./')
 
 from flask import Flask
 from flask import request
+from flask import session
 import bp
 
+
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.urandom()
+
 
 @app.route('/')
 def hello_world():
-   return 'Hello World'
+    return 'Hello World'
 
 
-def run_server(debug = False):
-   app.register_blueprint(bp.auth.bp)
-   app.register_blueprint(bp.buyer.bp)
-   app.register_blueprint(bp.seller.bp)
-   app.run(debug = debug)
+def run_server(debug=False):
+    app.register_blueprint(bp.auth.bp)
+    app.register_blueprint(bp.buyer.bp)
+    app.register_blueprint(bp.seller.bp)
+    app.run(debug=debug)
 
 
 def shutdown_server():
@@ -27,8 +32,8 @@ def shutdown_server():
 
 
 def be_run():
-   run_server()
-   return "Server start"
+    run_server()
+    return "Server start"
 
 
 def be_shutdown():
@@ -37,4 +42,4 @@ def be_shutdown():
 
 
 if __name__ == '__main__':
-   run_server(debug=True)
+    run_server(debug=True)

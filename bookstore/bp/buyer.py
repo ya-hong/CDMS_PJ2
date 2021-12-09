@@ -6,7 +6,7 @@ from bookstore.error import ErrorCode
 import uuid
 
 
-bp = Blueprint('buyer', __name__, url_prefix = "/buyer")
+bp = Blueprint('buyer', __name__, url_prefix="/buyer")
 conn = DB_handler().db_connect()
 
 
