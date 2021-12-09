@@ -1,1 +1,1 @@
-from bookstore.model.db_handler import  *
+from bookstore.model.db_handler import *

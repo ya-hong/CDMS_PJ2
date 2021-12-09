@@ -4,7 +4,7 @@ from flask import request
 from flask import jsonify
 from bookstore import error
 from bookstore.error import ErrorCode, message
-from bp import seller
+from bookstore.bp import seller
 import json
 
 bp_seller = Blueprint("seller", __name__, url_prefix="/seller")
