@@ -1,18 +1,16 @@
-import sys
 from flask import Blueprint
 from flask import request
-import flask
-from be.model.db_handler import DB_handler 
+from bookstore.model.db_handler import DB_handler
 from bookstore import error
 from bookstore.error import ErrorCode
 import uuid
 
 
-
 bp = Blueprint('buyer', __name__, url_prefix = "/buyer")
 conn = DB_handler().db_connect()
 
-@bp.route('/new_order', methods = ['POST'])
+
+@bp.route('/new_order', methods=['POST'])
 def new_order():
     params = request.json
     user_id = params["user_id"]
