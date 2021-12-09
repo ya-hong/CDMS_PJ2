@@ -2,7 +2,11 @@ import sys
 
 from flask import Flask
 from flask import request
+<<<<<<< HEAD
+import bp
+=======
 from bookstore import bp
+>>>>>>> f24711499c798943088c52a5dd517b16d2efad7b
 
 app = Flask(__name__)
 
@@ -34,3 +38,9 @@ def be_shutdown():
     shutdown_server()
     return "Server shutting down..."
 
+<<<<<<< HEAD
+
+if __name__ == '__main__':
+   run_server(debug=True)
+=======
+>>>>>>> f24711499c798943088c52a5dd517b16d2efad7b
