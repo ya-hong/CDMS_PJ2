@@ -83,4 +83,8 @@ def logout():
     else:
         code = 401
         body = {"message": "登出失败，用户名或token错误"}
+<<<<<<< HEAD
     return jsonify(body), code
+=======
+    return jsonify(body), code
+>>>>>>> f24711499c798943088c52a5dd517b16d2efad7b

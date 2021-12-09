@@ -1,130 +1,102 @@
-from flask import Blueprint
-from flask import request
-from bookstore.model.db_handler import DB_handler
-from bookstore import error
-from bookstore.error import ErrorCode
+from configparser import Error
+from db_handler import DB_handler
+import error
+from error import ErrorCode
 import uuid
+import json
 
 
-bp = Blueprint('buyer', __name__, url_prefix = "/buyer")
-conn = DB_handler().db_connect()
+class foo_exception(Exception):
+    def __init__(self, msg):
+        self.args = msg
+
+    def __str__(self):
+        return self.args
 
 
-@bp.route('/new_order', methods=['POST'])
-def new_order():
-    params = request.json
-    user_id = params["user_id"]
-    store_id = params["store_id"]
-    books = params["books"] # {id, count}
-    cur = conn.cursor()
-    cur.execute("LOCK TABLE books IN ACCESS EXCLUSIVE MODE;")
-    code = 200
-    for book in books:
-        book_id = book['id']
-        buy_count = book['count']
-        cur.execute("SELECT quantity FROM books WHERE book_id = ?;", [book_id])
-        row = cur.fetchone()
-        if row is None:
-            code = ErrorCode.BOOK_NOT_EXIST
-        elif row[0] < buy_count:
-            code = ErrorCode.INVENTORY_SHORTAGE
-        if code != 200:
-            break
-    if code != 200:
+class Seller:
+    def __init__(self):
+        self.conn = None
+
+    def create_store(self, uid, shop_id):
+        self.conn = DB_handler().db_connect()
+        cur = self.conn.cursor()
+        code = ErrorCode.OK
+        try:
+            check_code = error.check_uid_existence(cur, uid)
+            if check_code == ErrorCode.USER_NOT_EXIST:
+                raise foo_exception(check_code)
+            check_code = error.check_shop_id_existence(cur, shop_id)
+            if check_code == ErrorCode.SHOP_HAS_EXISTED:
+                raise foo_exception(check_code)
+            cur.execute("begin;")
+            cur.execute("LOCK TABLE shops IN ACCESS EXCLUSIVE MODE;")
+            cur.execute("INSERT INTO shops(shop_id, uid) VALUES(?, ?);", (shop_id, uid));
+            cur.execute("END;")
+        except BaseException as e:
+            print("{}".format(str(e)))
+            code = ErrorCode.BASE_EXCEPTION_OCCURED
+        except foo_exception as e:
+            code = int(e)
         cur.close()
+        self.conn.commit()
+        self.conn.close()
         return error.message(code)
 
-    order_id = "{}_{}_{}".format(user_id, store_id, str(uuid.uuid1()))
-    cur.execute(
-        "INSERT INTO orders(ORDER_ID, UID, SHOP_ID, ORDER_TIME, CURRENT_STATE)"
-        "VALUES(?, ?, ?, ?, ?);",
-        [order_id, user_id, store_id, 1, 1]
-    )
+    def add_book(self, uid, shop_id, key, value):
+        book_id = value[0]
+        padding = ', '.join(['?' for i in range(len(value))])
+        self.conn = DB_handler().db_connect()
+        cur = self.conn.cursor()
+        code = ErrorCode.OK
+        try: 
+            check_code = error.check_uid_existence(cur, uid)
+            if check_code == ErrorCode.USER_NOT_EXIST:
+                raise foo_exception(check_code)
+            check_code = error.check_shop_id_existence(cur, shop_id)
+            if check_code == ErrorCode.SHOP_NOT_EXIST:
+                raise foo_exception(check_code)
+            check_code = error.check_book_existence(cur, book_id)
+            if check_code == ErrorCode.BOOK_HAS_EXISTED:
+                raise foo_exception(check_code)
+            cur.execute("begin;")
+            cur.execute("LOCK TABLE books IN ACCESS EXCLUSIVE MODE;")
+            cur.execute("INSERT INTO books(?) VALUES(" + padding + ");", (key, value));
+            cur.execute("END;")
+        except BaseException as e:
+            print("{}".format(str(e)))
+            code = ErrorCode.BASE_EXCEPTION_OCCURED
+        except foo_exception as e:
+            code = int(e)
+        cur.close()
+        self.conn.commit()
+        self.conn.close()
+        return error.message(code)
     
-    for book in books:
-        book_id = book['id']
-        buy_count = book['count']
-        cur.execute(
-            "UPDATE books SET quantity = quantity - ? "
-            "WHERE book_id = ?;"
-            , [buy_count, book_id])
-        cur.execute(
-            "INSERT INTO ORDER_BOOK(order_id, BOOK_ID, ORDER_QUANTITY) "
-            "VALUES(?, ?, ?);",
-            [order_id, book_id, buy_count]
-        )
-    cur.close()
-    conn.commit()
-    return {'order_id': order_id}, 200
-
-
-@bp.route('/payment', methods = ['POST'])
-#   "user_id": "buyer_id",
-#   "order_id": "order_id",
-#   "password": "password"
-def payment():
-    params = request.json
-    user_id = params['user_id']
-    order_id = params['order_id']
-    password = params['password']
-    code = 200
-    # TODO: 权限检查
-    cur = conn.cursor()
-    
-    cur.execute(
-        "SELECT SUM(books.price * order_book.order_quantity) "
-        "FROM books join order_book in books.book_id = order_book.book_id "
-        "WHERE order_id = ? ;",
-        [order_id]
-    )
-    result = cur.fetchone()
-    if result is None:
-        code = ErrorCode.INVAILD_PARAMS
-    else:
-        value = result[0]
-        cur.execute("LOCK TABLE users IN ACCESS EXCLUSIVE MODE;")
-        cur.execute("SELECT balance FROM users where uid = ?", [user_id])
-        if cur.fetchone()[0] < value:
-            code = ErrorCode.INSUFFICIENT_BALANCE
-        else:
-            cur.execute(
-                "UPDATE users SET BALANCE = BALANCE - ? "
-                "WHERE uid = ?;"
-                , [value, user_id]
-            )
-            cur.execute(
-                "DELETE FROM orders WHERE order_id = ?;",
-                [order_id]
-            )
-            cur.execute(
-                "DELETE FROM order_book WHERE order_id = ?;",
-                [order_id]
-            )
-    cur.close()
-    conn.commit()
-    return error.message(code)
-
-
-@bp.route("/add_funds", methods = ["POST"])
-# "user_id": "user_id",
-# "password": "password",
-# "add_value": 10
-def add_funds():
-    params = request.json
-    user_id = params['user_id']
-    password = params['password']
-    add_value = params['add_value']
-    code = 200
-    # TODO: 权限检查
-
-    if add_value < 0:
-        code = ErrorCode.INVAILD_PARAMS
-
-    cur = conn.cursor()
-    cur.execute("LOCK TABLE users IN ACCESS EXCLUSIVE MODE;")
-    cur.execute(
-        "UPDATE users SET BALANCE = BALANCE + ? "
-        "WHERE uid = ?;"
-        , [add_value, user_id])
-    cur.close()
-    return '充值成功', code 
+    def add_stock_level(self, uid, shop_id, book_id, offset):
+        self.conn = DB_handler().db_connect()
+        cur = self.conn.cursor()
+        code = ErrorCode.OK
+        try:
+            check_code = error.check_uid_existence(cur, uid)
+            if check_code == ErrorCode.USER_NOT_EXIST:
+                raise foo_exception(check_code)
+            check_code = error.check_shop_id_existence(cur, shop_id)
+            if check_code == ErrorCode.SHOP_NOT_EXIST:
+                raise foo_exception(check_code)
+            if check_code == ErrorCode.BOOK_NOT_EXIST:
+                raise foo_exception(check_code)
+            cur.execute("begin;")
+            cur.execute("LOCK TABLE books IN ACCESS EXCLUSIVE MODE;")
+            cur.execute('UPDATE books SET QUANTITY = QUANTITY - ? \
+                        WHERE shop_id = ? AND book_id = ?;', (offset, shop_id, book_id))
+            cur.execute("end;")
+        except BaseException as e:
+            print("{}".format(str(e)))
+            code = ErrorCode.BASE_EXCEPTION_OCCURED
+        except foo_exception as e:
+            code = int(e)
+        cur.close()
+        self.conn.commit()
+        self.conn.close()
+        return error.message(code)

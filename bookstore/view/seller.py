@@ -51,3 +51,5 @@ def seller_add_stock_level():
         message, code = error.message(ErrorCode.OFFSET_NOT_POSITIVE)
     else:
         s = seller.Seller()
+        message, code = s.add_stock_level(uid, shop_id, book_id, offset)
+    return jsonify({"message": message}), code
