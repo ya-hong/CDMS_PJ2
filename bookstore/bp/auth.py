@@ -1,11 +1,11 @@
 from flask import Blueprint
 from flask import request
 from flask import jsonify
-from be.model.auth import *
+from bookstore.model.auth import *
 import random
 
 
-bp = Blueprint('auth', __name__, url_prefix = "/auth")
+bp = Blueprint('auth', __name__, url_prefix="/auth")
 
 
 @bp.route('/register', methods = ['POST'])

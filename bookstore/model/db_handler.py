@@ -7,7 +7,7 @@ from configparser import ConfigParser
 class DB_handler:
     def __init__(self):
         self.section = "postgresql"
-        self.config_path = "../model/database.ini"
+        self.config_path = "./model/database.ini"
 
     def config(self):
         parser = ConfigParser()

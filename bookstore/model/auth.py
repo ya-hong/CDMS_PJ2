@@ -1,4 +1,4 @@
-from be.model.db_handler import *
+from bookstore.model.db_handler import *
 import psycopg2
 import time
 
@@ -20,6 +20,7 @@ class User:
             cur.execute(command, (user_id,))
             row_num = cur.rowcount
             cur.close()
+            conn.close()
             if row_num != 0:
                 return True
             else:
@@ -27,7 +28,7 @@ class User:
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 
-    def get_token(self, user_id):
+    def check_token(self, user_id):
         try:
             conn = self.get_conn()
             cur = conn.cursor()
@@ -35,6 +36,12 @@ class User:
             cur.execute(command, (user_id, ))
             token = cur.fetchone()[0]
             cur.close()
+            conn.close()
+            if token is not None:
+                current_time = time.time()
+                delta = int(token) - int(current_time)  # token时效检查
+                if delta > 3600:
+                    return None
             return token
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
@@ -50,6 +57,7 @@ class User:
             cur.execute(command, (user_id, password))
             conn.commit()
             cur.close()
+            conn.close()
             return True
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
@@ -66,6 +74,7 @@ class User:
             flag = cur.rowcount
             conn.commit()
             cur.close()
+            conn.close()
             if flag == 1:
                 return True
             else:
@@ -85,6 +94,7 @@ class User:
             flag = cur.rowcount
             conn.commit()
             cur.close()
+            conn.close()
             if flag == 1:
                 # 生成token，存入数据库
                 start_time = time.time()
@@ -113,6 +123,7 @@ class User:
             flag = cur.rowcount
             conn.commit()
             cur.close()
+            conn.close()
             if flag == 1:
                 return True
             else:
@@ -121,11 +132,8 @@ class User:
             print(error)
 
     # 用户登出
-    def logout(self, user_id, token):
-        if not self.check_uid(user_id) or self.get_token(user_id) is None:
-            return False
-        current_time = time.time()
-        if int(token) - int(current_time) >= 3600:
+    def logout(self, user_id):
+        if not self.check_uid(user_id) or self.check_token(user_id) is None:
             return False
         try:
             conn = self.get_conn()
@@ -134,6 +142,7 @@ class User:
             cur.execute(command, (user_id, ))
             conn.commit()
             cur.close()
+            conn.close()
             return True
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
