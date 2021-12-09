@@ -8,8 +8,8 @@ import os
 class DB_handler:
     def __init__(self):
         self.section = "postgresql"
-        print(os.getcwd())
-        self.config_path = "be/model/database.ini"
+        # 请把 database.ini 移到本文件的相同目录
+        self.config_path = os.path.join(os.path.dirname(__file__), 'database.ini')
         self.init_tables()
 
     def init_tables(self):
@@ -17,21 +17,19 @@ class DB_handler:
             "CREATE TABLE IF NOT EXISTS USERS ( \
             UID VARCHAR(255) PRIMARY KEY, \
             PWD TEXT NOT NULL, \
-            SHOP_ID VARCHAR(255) NOT NULL, \
             BALANCE FLOAT NOT NULL, \
             TOKEN TEXT, \
             TERMINAL TEXT \
-            )\
+            );\
             ",
             " CREATE TABLE IF NOT EXISTS SHOPS ( \
             SHOP_ID VARCHAR(255) PRIMARY KEY, \
             UID VARCHAR(255) NOT NULL, \
             RANKING INTEGER\
-            )\
+            );\
             ",
             " CREATE TABLE IF NOT EXISTS BOOKS ( \
             BOOK_ID TEXT PRIMARY KEY, \
-            UID VARCHAR(255) NOT NULL, \
             SHOP_ID VARCHAR(255) NOT NULL, \
             QUANTITY INTEGER NOT NULL, \
             title TEXT, \
@@ -49,7 +47,7 @@ class DB_handler:
             book_intro TEXT, \
             content TEXT, \
             tags TEXT\
-            )\
+            );\
             ",
             " CREATE TABLE IF NOT EXISTS ORDERS (\
             ORDER_ID TEXT PRIMARY KEY, \
@@ -57,7 +55,7 @@ class DB_handler:
             SHOP_ID VARCHAR(255) NOT NULL, \
             ORDER_TIME TEXT NOT NULL, \
             CURRENT_STATE INTEGER NOT NULL\
-            )\
+            );\
             ",
             " CREATE TABLE IF NOT EXISTS ORDER_BOOK (\
             ORDER_ID TEXT, \
@@ -70,28 +68,23 @@ class DB_handler:
             REFERENCES BOOKS (BOOK_ID)\
             ON UPDATE CASCADE ON DELETE CASCADE,\
             ORDER_QUANTITY INTEGER NOT NULL\
-            )\
+            );\
             "
         )
-        fk_commands = ("ALTER TABLE USERS \
-                        ADD FOREIGN KEY (SHOP_ID) \
-                        REFERENCES SHOPS(SHOP_ID) \
-                        ",
+        fk_commands = (
                        "ALTER TABLE SHOPS \
                         ADD FOREIGN KEY (UID) \
-                        REFERENCES USERS(UID) \
+                        REFERENCES USERS(UID); \
                         ",
                        "ALTER TABLE BOOKS\
-                        ADD FOREIGN KEY (UID)\
-                        REFERENCES USERS(UID),\
                         ADD FOREIGN KEY (SHOP_ID)\
-                        REFERENCES SHOPS(SHOP_ID)\
+                        REFERENCES SHOPS(SHOP_ID);\
                         ",
                        "ALTER TABLE ORDERS\
                         ADD FOREIGN KEY (UID)\
                         REFERENCES USERS(UID),\
                         ADD FOREIGN KEY (SHOP_ID)\
-                        REFERENCES SHOPS(SHOP_ID),\
+                        REFERENCES SHOPS(SHOP_ID);\
                         ")
         try:
             conn = self.db_connect()

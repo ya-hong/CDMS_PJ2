@@ -16,7 +16,7 @@ class User:
         try:
             conn = self.get_conn()
             cur = conn.cursor()
-            command = "SELECT * FROM users WHERE user_id = %s"
+            command = "SELECT * FROM users WHERE uid = %s"
             cur.execute(command, (user_id,))
             row_num = cur.rowcount
             cur.close()
@@ -32,7 +32,7 @@ class User:
         try:
             conn = self.get_conn()
             cur = conn.cursor()
-            command = "SELECT token FROM users WHERE user_id = %s"
+            command = "SELECT token FROM users WHERE uid = %s"
             cur.execute(command, (user_id, ))
             token = cur.fetchone()[0]
             cur.close()
@@ -53,7 +53,7 @@ class User:
         try:
             conn = self.get_conn()
             cur = conn.cursor()
-            command = "INSERT INTO users (user_id, password) VALUES (%s, %s)"
+            command = "INSERT INTO users (uid, pwd) VALUES (%s, %s)"
             cur.execute(command, (user_id, password))
             conn.commit()
             cur.close()
@@ -69,7 +69,7 @@ class User:
         try:
             conn = self.get_conn()
             cur = conn.cursor()
-            command = "DELETE FROM users WHERE user_id=%s AND password=%s"
+            command = "DELETE FROM users WHERE uid=%s AND password=%s"
             cur.execute(command, (user_id, password))
             flag = cur.rowcount
             conn.commit()
@@ -89,7 +89,7 @@ class User:
         try:
             conn = self.get_conn()
             cur = conn.cursor()
-            command = "UPDATE users SET terminal=%s WHERE user_id=%s AND password=%s"
+            command = "UPDATE users SET terminal=%s WHERE uid=%s AND pwd=%s"
             cur.execute(command, (terminal, user_id, password))
             flag = cur.rowcount
             conn.commit()
@@ -100,7 +100,7 @@ class User:
                 start_time = time.time()
                 token = str(int(start_time))
                 cur = conn.cursor()
-                command = "UPDATE users SET token=%s WHERE user_id=%s"
+                command = "UPDATE users SET token=%s WHERE uid=%s"
                 cur.execute(command, (token, user_id))
                 conn.commit()
                 cur.close()
@@ -118,7 +118,7 @@ class User:
         try:
             conn = self.get_conn()
             cur = conn.cursor()
-            command = "UPDATE users SET password=%s WHERE user_id=%s AND password=%s"
+            command = "UPDATE users SET pwd=%s WHERE uid=%s AND pwd=%s"
             cur.execute(command, (new_password, user_id, old_password))
             flag = cur.rowcount
             conn.commit()
@@ -138,7 +138,7 @@ class User:
         try:
             conn = self.get_conn()
             cur = conn.cursor()
-            command = "UPDATE users SET token=null, terminal=null WHERE user_id=%s"
+            command = "UPDATE users SET token=null, terminal=null WHERE uid=%s"
             cur.execute(command, (user_id, ))
             conn.commit()
             cur.close()

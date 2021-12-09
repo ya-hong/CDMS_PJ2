@@ -1,9 +1,8 @@
 import sys
-sys.path.append('./')
 
 from flask import Flask
 from flask import request
-import bp
+from bookstore import bp
 
 app = Flask(__name__)
 
@@ -35,6 +34,3 @@ def be_shutdown():
     shutdown_server()
     return "Server shutting down..."
 
-
-if __name__ == '__main__':
-   run_server(debug=True)
