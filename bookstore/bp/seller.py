@@ -1,8 +1,7 @@
-from db_handler import DB_handler
-import error
-from error import ErrorCode
-import uuid
-import json
+from bookstore.model.db_handler import DB_handler
+import bookstore.error as error
+from bookstore.error import ErrorCode
+
 
 
 class foo_exception(Exception):
@@ -48,7 +47,7 @@ class Seller:
         self.conn = DB_handler().db_connect()
         cur = self.conn.cursor()
         code = ErrorCode.OK
-        try: 
+        try:
             check_code = error.check_uid_existence(cur, uid)
             if check_code == ErrorCode.USER_NOT_EXIST:
                 raise foo_exception(check_code)
@@ -71,7 +70,7 @@ class Seller:
         self.conn.commit()
         self.conn.close()
         return error.message(code)
-    
+
     def add_stock_level(self, uid, shop_id, book_id, offset):
         self.conn = DB_handler().db_connect()
         cur = self.conn.cursor()

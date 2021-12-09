@@ -1,6 +1,7 @@
 from flask import Blueprint
 from flask import request
 from flask import jsonify
+from flask import session
 from bookstore.model.auth import *
 import random
 
@@ -23,7 +24,7 @@ def register():
     return jsonify(body), code
 
 
-@bp.route('/unregister', methods = ['POST'])
+@bp.route('/unregister', methods=['POST'])
 def unregister():
     params = request.json
     user_id = params["user_id"]
@@ -38,7 +39,7 @@ def unregister():
     return jsonify(body), code
 
 
-@bp.route('/login', methods = ['POST', 'GET'])
+@bp.route('/login', methods=['POST', 'GET'])
 def login():
     params = request.json
     user_id = params["user_id"]
@@ -46,6 +47,7 @@ def login():
     terminal = ''.join(str(random.choice(range(10))) for _ in range(10))
     user = User()
     token = user.login(user_id, password, terminal)
+    session["token"] = token
     if token is not None:
         code = 200
         body = {"message": "OK", "token": token}
@@ -71,20 +73,16 @@ def password():
     return jsonify(body), code
 
 
-@bp.route('/logout', methods = ['POST'])
+@bp.route('/logout', methods=['POST'])
 def logout():
     params = request.json
     user_id = params["user_id"]
-    token = request.headers["token"]
+    token = request.headers.get("token")
     user = User()
-    if user.logout(user_id, token):
+    if user.logout(user_id):
         code = 200
         body = {"message": "登出成功"}
     else:
         code = 401
         body = {"message": "登出失败，用户名或token错误"}
-<<<<<<< HEAD
     return jsonify(body), code
-=======
-    return jsonify(body), code
->>>>>>> f24711499c798943088c52a5dd517b16d2efad7b
