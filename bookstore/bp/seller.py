@@ -1,4 +1,3 @@
-from configparser import Error
 from db_handler import DB_handler
 import error
 from error import ErrorCode

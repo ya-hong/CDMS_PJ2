@@ -18,7 +18,6 @@ class DB_handler:
             UID VARCHAR(255) PRIMARY KEY, \
             PWD TEXT NOT NULL, \
             BALANCE FLOAT NOT NULL, \
-            TOKEN TEXT, \
             TERMINAL TEXT \
             )\
             ",
