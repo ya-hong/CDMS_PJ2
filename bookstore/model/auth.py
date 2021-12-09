@@ -1,5 +1,5 @@
+from bookstore.error import *
 from bookstore.model.db_handler import *
-from bookstore.sql.utils import *
 import psycopg2
 import time
 

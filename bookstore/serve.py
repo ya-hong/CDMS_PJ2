@@ -1,15 +1,8 @@
-import os
-import sys
-sys.path.append('./')
-
 from flask import Flask
 from flask import request
-from flask import session
-import bp
-
+from bookstore import bp
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.urandom()
 
 
 @app.route('/')
@@ -21,7 +14,7 @@ def run_server(debug=False):
     app.register_blueprint(bp.auth.bp)
     app.register_blueprint(bp.buyer.bp)
     app.register_blueprint(bp.seller.bp)
-    app.run(debug=debug)
+    app.run(debug = debug)
 
 
 def shutdown_server():
