@@ -2,4 +2,4 @@
 
 __all__ = ['auth', 'buyer', 'seller']
 
-from bp import *
+from bookstore.bp import *

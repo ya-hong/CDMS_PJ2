@@ -3,7 +3,6 @@ sys.path.append('./')
 
 from flask import Flask
 from flask import request
-import be
 import bp
 
 app = Flask(__name__)
