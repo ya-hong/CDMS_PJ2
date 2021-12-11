@@ -2,17 +2,19 @@
 
 import psycopg2
 from configparser import ConfigParser
+import os
 
 
 class DB_handler:
     def __init__(self):
         self.section = "postgresql"
-        self.config_path = "./model/database.ini"
+        print(os.getcwd())
+        self.config_path = "be/model/database.ini"
         self.init_tables()
 
     def init_tables(self):
         commands = (
-            "CREATE TABLE IF NOT EXISTS users ( \
+            "CREATE TABLE IF NOT EXISTS USERS ( \
             UID VARCHAR(255) PRIMARY KEY, \
             PWD TEXT NOT NULL, \
             BALANCE FLOAT NOT NULL, \
@@ -27,8 +29,9 @@ class DB_handler:
             )\
             ",
             " CREATE TABLE IF NOT EXISTS BOOKS ( \
-            BOOK_ID TEXT PRIMARY KEY, \
-            SHOP_ID VARCHAR(255) NOT NULL, \
+            BOOK_ID TEXT, \
+            SHOP_ID VARCHAR(255), \
+            PRIMARY KEY (book_id, shop_id),\
             QUANTITY INTEGER NOT NULL, \
             title TEXT, \
             author TEXT, \
@@ -44,7 +47,8 @@ class DB_handler:
             author_intro TEXT, \
             book_intro TEXT, \
             content TEXT, \
-            tags TEXT\
+            tags TEXT,\
+            pictures TEXT\
             )\
             ",
             " CREATE TABLE IF NOT EXISTS ORDERS (\
@@ -70,20 +74,20 @@ class DB_handler:
             "
         )
         fk_commands = (
-            "ALTER TABLE SHOPS \
-            ADD FOREIGN KEY (UID) \
-            REFERENCES USERS(UID);\
-            ",
-            "ALTER TABLE BOOKS\
-            ADD FOREIGN KEY (SHOP_ID)\
-            REFERENCES SHOPS(SHOP_ID);\
-            ",
-            "ALTER TABLE ORDERS\
-            ADD FOREIGN KEY (UID)\
-            REFERENCES USERS(UID),\
-            ADD FOREIGN KEY (SHOP_ID)\
-            REFERENCES SHOPS(SHOP_ID);\
-        ")
+                       "ALTER TABLE SHOPS \
+                        ADD FOREIGN KEY (UID) \
+                        REFERENCES USERS(UID); \
+                        ",
+                       "ALTER TABLE BOOKS\
+                        ADD FOREIGN KEY (SHOP_ID)\
+                        REFERENCES SHOPS(SHOP_ID);\
+                        ",
+                       "ALTER TABLE ORDERS\
+                        ADD FOREIGN KEY (UID)\
+                        REFERENCES USERS(UID),\
+                        ADD FOREIGN KEY (SHOP_ID)\
+                        REFERENCES SHOPS(SHOP_ID);\
+                        ")
         try:
             conn = self.db_connect()
             cur = conn.cursor()
@@ -107,6 +111,10 @@ class DB_handler:
             conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+        finally:
+            if conn is not None:
+                conn.close()
+            print('Database connection closed.')
 
     def config(self):
         parser = ConfigParser()
@@ -128,13 +136,10 @@ class DB_handler:
             params = self.config()
 
             conn = psycopg2.connect(**params)
-            # print("Successfully connected.")
+            print("Successfully connected.")
 
         except (Exception, psycopg2.DatabaseError) as error:
             print("Failed to connect.")
             print(error)
 
         return conn
-
-
-db_handler = DB_handler()
