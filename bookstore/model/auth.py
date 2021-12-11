@@ -53,7 +53,7 @@ class User:
         try:
             conn = self.get_conn()
             cur = conn.cursor()
-            command = "INSERT INTO users (uid, pwd) VALUES (%s, %s)"
+            command = "INSERT INTO users (uid, pwd, balance) VALUES (%s, %s, 0)"
             cur.execute(command, (user_id, password))
             conn.commit()
             cur.close()
