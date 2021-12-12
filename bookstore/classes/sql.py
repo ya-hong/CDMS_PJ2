@@ -51,12 +51,12 @@ class SQL:
     def execute(self, str, arg = []):
         try:
             cur = self.conn.cursor()
-            cur.execute(str, arg)
+            cur.execute(str, tuple(arg))
             if str.split()[0].lower() == 'select':
                 ret = cur.fetchall()
             else:
                 ret = True
-        except psycopg2.DatabaseError as error:
+        except Exception as error:
             print("数据库错误", error)
             print("查询： ", str, arg)
             raise error
@@ -83,8 +83,11 @@ class SQL:
 
     def find_by_id(self, table, id):
         try:
-            ret = self.transaction("SELECT * FROM ? WHERE ? = %s;", [table, ID[table], id])
-            return ret[0]
+            ret = self.transaction("SELECT * FROM {} WHERE {} = %s;".format(table, ID[table]), [id])
+            if len(ret):
+                return ret[0]
+            else:
+                return None
         except Exception as err:
             print("find_by_id 错误")
             print(err)
@@ -94,10 +97,7 @@ class SQL:
     def check(self, table, id):
         try:
             ret = self.find_by_id(table, id)
-            if len(ret):
-                return True
-            else:
-                return False
+            return not ret is None
         except Exception as err:
             print(err)
             return err

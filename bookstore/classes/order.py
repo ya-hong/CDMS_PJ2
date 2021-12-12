@@ -30,7 +30,7 @@ class Order:
         try:
             (self.order_id, self.user_id, self.shop_id, 
                 order_time, current_state) = self.sql.find_by_id('shops', self.shop_id)
-            ret = self.sql.transaction("SELECT book_id, order_quantity FROM order_book WHERE order_id = ?", [self.order_id])
+            ret = self.sql.transaction("SELECT book_id, order_quantity FROM order_book WHERE order_id = %s", [self.order_id])
             self.books = dict(zip(
                 [ret[i][0] for i in range(len(ret))],
                 [ret[i][1] for i in range(len(ret))]
@@ -41,5 +41,5 @@ class Order:
 
     def pay(self):
         with self.sql.transaction():
-            self.sql.execute("DELETE orders WHERE order_id = ?", [self.order_id])
-            self.sql.execute("DELETE order_book WHERE order_id = ?", [self.order_id])
+            self.sql.execute("DELETE FROM orders WHERE order_id = %s", [self.order_id])
+            self.sql.execute("DELETE FROM order_book WHERE order_id = %s", [self.order_id])

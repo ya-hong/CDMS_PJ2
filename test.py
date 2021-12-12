@@ -16,3 +16,7 @@ print(ret)
 
 ret = sql.transaction("SELECT * FROM order_book;")
 print(ret)
+
+
+# sql.transaction("DELETE FROM order_book;")
+# sql.transaction("DELETE FROM orders;")
