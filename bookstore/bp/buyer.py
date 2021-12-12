@@ -15,10 +15,10 @@ def new_order():
     user_id = params["user_id"]
     store_id = params["store_id"]
     books = params["books"] # {id, count}
-    # token = request.headers["token"]
+    token = request.headers["token"]
 
-    # if not Token.check_token(token):
-    #     pass 
+    if not Token.check_token(token):
+        return error.NO_PERMISSION().ret()
 
     try:
         user = User(user_id)
@@ -39,11 +39,11 @@ def payment():
     user_id = params['user_id']
     order_id = params['order_id']
     password = params['password']
-    token = request.headers["token"]
 
-    if not Token.check_token(token):
-        pass 
     try:
+        user = User(user_id)
+        if user.password != password:
+            raise error.NO_PERMISSION
         User(user_id).payment(Order(order_id))
     except error.Err as err:
         return err.ret()
@@ -61,10 +61,11 @@ def add_funds():
     token = request.headers["token"]
 
     if not Token.check_token(token):
-            pass 
+        return error.NO_PERMISSION().ret()
+
     
     if add_value < 0:
-        return error.INVAILD_PARAMS.ret()
+        return error.INVALID_PARAMS.ret()
 
     try:
         User(user_id).add_funds(add_value)
