@@ -1,0 +1,7 @@
+{
+    "url": "seller/add_stock_level",
+    "user_id": "x",
+    "store_id": "x_store",
+    "book_id": "x_book",
+    "add_stock_level": 10
+}

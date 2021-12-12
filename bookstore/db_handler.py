@@ -16,7 +16,7 @@ class DB_handler:
         try:
             conn = self.db_connect()
             cur = conn.cursor()
-            with open('create_table.sql', 'r') as f:
+            with open(os.path.join(os.path.dirname(__file__), 'create_table.sql'), 'r') as f:
                 cur.execute(f.read())
             cur.close()
             conn.commit()

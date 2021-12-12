@@ -23,5 +23,5 @@ if __name__ == '__main__':
       print(url)
       
       # headers = {"token": self.token}
-      r = requests.post(url, json=dic)
+      r = requests.post(url, json=dic, headers={'token': '11'})
       print(r)

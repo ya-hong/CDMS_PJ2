@@ -86,6 +86,7 @@ class SQL:
             ret = self.transaction("SELECT * FROM ? WHERE ? = %s;", [table, ID[table], id])
             return ret[0]
         except Exception as err:
+            print("find_by_id 错误")
             print(err)
             return err
 

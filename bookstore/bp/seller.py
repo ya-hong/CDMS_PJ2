@@ -8,7 +8,7 @@ from bookstore.classes.model import *
 from bookstore.classes.sql import SQL
 
 
-bp = Blueprint('buyer', __name__, url_prefix = "/seller")
+bp = Blueprint('seller', __name__, url_prefix = "/seller")
 
 
 @bp.route("/create_store", methods=['POST'])
@@ -26,7 +26,7 @@ def create_store():
         pass
     
     try:
-        Shop().create(user_id, shop_id)
+        Shop.create(user_id, shop_id)
     except error.Err as err:
         return err.ret()
     return error.ok.ret()

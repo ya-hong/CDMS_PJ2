@@ -138,11 +138,11 @@ class DB_handler:
         return conn
 
 
-conn = DB_handler().db_connect()
-cur = conn.cursor()
-try:
-    cur.execute("select * from shops;")
-    if cur.fetchone() is None:
-        print("YYY")
-except psycopg2.DatabaseError as e:
-    print("XXX")
+# conn = DB_handler().db_connect()
+# cur = conn.cursor()
+# try:
+#     cur.execute("select * from shops;")
+#     if cur.fetchone() is None:
+#         print("YYY")
+# except psycopg2.DatabaseError as e:
+#     print("XXX")

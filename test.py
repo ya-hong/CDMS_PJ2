@@ -7,3 +7,12 @@ from bookstore.bp import auth
 sql = SQL()
 ret = sql.transaction("SELECT * FROM users;")
 print(ret)
+
+ret = sql.transaction("SELECT * FROM shops;")
+print(ret)
+
+ret = sql.transaction("SELECT * FROM books;")
+print(ret)
+
+ret = sql.transaction("SELECT * FROM order_book;")
+print(ret)
