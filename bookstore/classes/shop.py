@@ -29,7 +29,7 @@ class Shop:
     def fetch(self):
         try:
             (self.shop_id, self.user_id, self.ranking) = self.sql.find_by_id('shops', self.shop_id)
-            ret = self.sql.transaction("SELECT book_id, quantity FROM books WHERE shop_id = ?", [self.shop_id])
+            ret = self.sql.transaction("SELECT book_id, quantity FROM books WHERE shop_id = %s", [self.shop_id])
             self.books = dict(zip(
                 [ret[i][0] for i in range(len(ret))],
                 [ret[i][1] for i in range(len(ret))]
@@ -41,8 +41,14 @@ class Shop:
     def add_book(self, book_info, quantity):
         if self.sql.check("books", book_info['id']):
             raise error.DUPLICATE_BOOKID
-        tags = ", ".join(['book_id', 'shop_id', 'quantity'].extend(list(book_info.keys())[1:]))
-        arr = [book_info[id], self.shop_id, int(quantity)].extend(list(book_info.values())[1:])
+        book_id = book_info['id']
+        del book_info['id']
+        del book_info['pictures']
+        tags = ['book_id', 'shop_id', 'quantity']
+        tags.extend(list(book_info.keys()))
+        arr = [book_id, self.shop_id, int(quantity)]
+        arr.extend(list(book_info.values()))
+        tags = ", ".join(tags)
         self.sql.insert("books", arr, tags)
 
 
@@ -50,6 +56,6 @@ class Shop:
     def add_stock_level(self, book_id, offset):
         if not self.sql.check("books", book_id):
             raise error.NO_BOOK
-        self.sql.transaction("UPDATE books SET quantity = quantity + ? WHERE shop_id = ? AND book_id = ?;",
+        self.sql.transaction("UPDATE books SET quantity = quantity + %s WHERE shop_id = %s AND book_id = %s;",
                              [offset, self.shop_id, book_id])
 
