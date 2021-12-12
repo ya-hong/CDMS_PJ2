@@ -1,13 +1,12 @@
 from flask import Blueprint
 from flask import request
-from bookstore.model.db_handler import DB_handler
 from bookstore import error
-from bookstore.error import ErrorCode
-import uuid
+from bookstore import Token
+from bookstore.classes.model import *
+from bookstore.classes.sql import SQL
 
 
-bp = Blueprint('buyer', __name__, url_prefix="/buyer")
-conn = DB_handler().db_connect()
+bp = Blueprint('buyer', __name__, url_prefix = "/buyer")
 
 
 @bp.route('/new_order', methods=['POST'])
@@ -16,46 +15,19 @@ def new_order():
     user_id = params["user_id"]
     store_id = params["store_id"]
     books = params["books"] # {id, count}
-    cur = conn.cursor()
-    cur.execute("LOCK TABLE books IN ACCESS EXCLUSIVE MODE;")
-    code = 200
-    for book in books:
-        book_id = book['id']
-        buy_count = book['count']
-        cur.execute("SELECT quantity FROM books WHERE book_id = ?;", [book_id])
-        row = cur.fetchone()
-        if row is None:
-            code = ErrorCode.BOOK_NOT_EXIST
-        elif row[0] < buy_count:
-            code = ErrorCode.INVENTORY_SHORTAGE
-        if code != 200:
-            break
-    if code != 200:
-        cur.close()
-        return error.message(code)
+    # token = request.headers["token"]
 
-    order_id = "{}_{}_{}".format(user_id, store_id, str(uuid.uuid1()))
-    cur.execute(
-        "INSERT INTO orders(ORDER_ID, UID, SHOP_ID, ORDER_TIME, CURRENT_STATE)"
-        "VALUES(?, ?, ?, ?, ?);",
-        [order_id, user_id, store_id, 1, 1]
-    )
-    
-    for book in books:
-        book_id = book['id']
-        buy_count = book['count']
-        cur.execute(
-            "UPDATE books SET quantity = quantity - ? "
-            "WHERE book_id = ?;"
-            , [buy_count, book_id])
-        cur.execute(
-            "INSERT INTO ORDER_BOOK(order_id, BOOK_ID, ORDER_QUANTITY) "
-            "VALUES(?, ?, ?);",
-            [order_id, book_id, buy_count]
-        )
-    cur.close()
-    conn.commit()
-    return {'order_id': order_id}, 200
+    # if not Token.check_token(token):
+    #     pass 
+
+    try:
+        user = User(user_id)
+        user.new_order(Shop(store_id), books)
+    except error.Err as err:
+        print(err)
+        return err.ret()
+
+    return error.ok.ret()
 
 
 @bp.route('/payment', methods = ['POST'])
@@ -67,43 +39,15 @@ def payment():
     user_id = params['user_id']
     order_id = params['order_id']
     password = params['password']
-    code = 200
-    # TODO: 权限检查
-    cur = conn.cursor()
-    
-    cur.execute(
-        "SELECT SUM(books.price * order_book.order_quantity) "
-        "FROM books join order_book in books.book_id = order_book.book_id "
-        "WHERE order_id = ? ;",
-        [order_id]
-    )
-    result = cur.fetchone()
-    if result is None:
-        code = ErrorCode.INVAILD_PARAMS
-    else:
-        value = result[0]
-        cur.execute("LOCK TABLE users IN ACCESS EXCLUSIVE MODE;")
-        cur.execute("SELECT balance FROM users where uid = ?", [user_id])
-        if cur.fetchone()[0] < value:
-            code = ErrorCode.INSUFFICIENT_BALANCE
-        else:
-            cur.execute(
-                "UPDATE users SET BALANCE = BALANCE - ? "
-                "WHERE uid = ?;"
-                , [value, user_id]
-            )
-            cur.execute(
-                "DELETE FROM orders WHERE order_id = ?;",
-                [order_id]
-            )
-            cur.execute(
-                "DELETE FROM order_book WHERE order_id = ?;",
-                [order_id]
-            )
-    cur.close()
-    conn.commit()
-    return error.message(code)
+    token = request.headers["token"]
 
+    if not Token.check_token(token):
+        pass 
+    try:
+        User(user_id).payment(Order(order_id))
+    except error.Err as err:
+        return err.ret()
+    return error.ok.ret()
 
 @bp.route("/add_funds", methods = ["POST"])
 # "user_id": "user_id",
@@ -114,17 +58,16 @@ def add_funds():
     user_id = params['user_id']
     password = params['password']
     add_value = params['add_value']
-    code = 200
-    # TODO: 权限检查
+    token = request.headers["token"]
 
+    if not Token.check_token(token):
+            pass 
+    
     if add_value < 0:
-        code = ErrorCode.INVAILD_PARAMS
+        return error.INVAILD_PARAMS.ret()
 
-    cur = conn.cursor()
-    cur.execute("LOCK TABLE users IN ACCESS EXCLUSIVE MODE;")
-    cur.execute(
-        "UPDATE users SET BALANCE = BALANCE + ? "
-        "WHERE uid = ?;"
-        , [add_value, user_id])
-    cur.close()
-    return '充值成功', code 
+    try:
+        User(user_id).add_funds(add_value)
+    except error.Err as err:
+        return err.ret()
+    return error.ok.ret()

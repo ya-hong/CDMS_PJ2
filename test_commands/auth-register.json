@@ -1,5 +1,6 @@
 {
     "url": "auth/register",
-    "user_id": "XC",
-    "password": "998244353"
+    "user_id": "x",
+    "password": "998244353",
+    "balance": 100
 }
