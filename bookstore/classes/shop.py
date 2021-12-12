@@ -39,6 +39,8 @@ class Shop:
 
 
     def add_book(self, book_info, quantity):
+        if self.sql.check("books", book_info['id']):
+            raise error.DUPLICATE_BOOKID
         tags = ", ".join(['book_id', 'shop_id', 'quantity'].extend(list(book_info.keys())[1:]))
         arr = [book_info[id], self.shop_id, int(quantity)].extend(list(book_info.values())[1:])
         self.sql.insert("books", arr, tags)
@@ -46,6 +48,8 @@ class Shop:
 
 
     def add_stock_level(self, book_id, offset):
+        if not self.sql.check("books", book_id):
+            raise error.NO_BOOK
         self.sql.transaction("UPDATE books SET quantity = quantity + ? WHERE shop_id = ? AND book_id = ?;",
                              [offset, self.shop_id, book_id])
 
