@@ -14,7 +14,7 @@
 """
 
 
-from bookstore.model.db_handler import DB_handler
+from bookstore.db_handler import DB_handler
 import psycopg2
 
 ID = {
