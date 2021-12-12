@@ -41,15 +41,14 @@ class Shop:
     def add_book(self, book_info, quantity):
         if self.sql.check("books", book_info['id']):
             raise error.DUPLICATE_BOOKID
-
-        l = ['shop_id', 'quantity']
-        l.extend(list(book_info.keys())[2:])
-        tags = ", ".join(l)
-        arr = [self.shop_id, int(quantity)]
-        arr.extend(list(book_info.values())[2:])
-        print('shop.py')
-        print(arr)
-        print(tags)
+        book_id = book_info['id']
+        del book_info['id']
+        del book_info['pictures']
+        tags = ['book_id', 'shop_id', 'quantity']
+        tags.extend(list(book_info.keys()))
+        arr = [book_id, self.shop_id, int(quantity)]
+        arr.extend(list(book_info.values()))
+        tags = ", ".join(tags)
         self.sql.insert("books", arr, tags)
 
 
