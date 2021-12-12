@@ -43,7 +43,7 @@ class NO_SELLER(Err):
     code = 505
     msg = '卖家用户ID不存在'
 
-class INVAILD_PARAMS(Err):
+class INVALID_PARAMS(Err):
     code = 506
     msg = '参数错误'
 

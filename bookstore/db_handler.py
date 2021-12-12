@@ -13,100 +13,11 @@ class DB_handler:
         self.init_tables()
 
     def init_tables(self):
-        commands = (
-            "CREATE TABLE IF NOT EXISTS USERS ( \
-            UID VARCHAR(255) PRIMARY KEY, \
-            PWD TEXT NOT NULL, \
-            BALANCE FLOAT NOT NULL, \
-            TOKEN TEXT, \
-            TERMINAL TEXT \
-            )\
-            ",
-            " CREATE TABLE IF NOT EXISTS SHOPS ( \
-            SHOP_ID VARCHAR(255) PRIMARY KEY, \
-            UID VARCHAR(255) NOT NULL, \
-            RANKING INTEGER\
-            )\
-            ",
-            " CREATE TABLE IF NOT EXISTS BOOKS ( \
-            BOOK_ID TEXT, \
-            SHOP_ID VARCHAR(255), \
-            PRIMARY KEY (book_id, shop_id),\
-            QUANTITY INTEGER NOT NULL, \
-            title TEXT, \
-            author TEXT, \
-            publisher TEXT, \
-            original_title TEXT, \
-            translator TEXT, \
-            pub_year TEXT, \
-            pages INTEGER, \
-            price INTEGER, \
-            currency_unit TEXT, \
-            binding TEXT, \
-            isbn TEXT, \
-            author_intro TEXT, \
-            book_intro TEXT, \
-            content TEXT, \
-            tags TEXT,\
-            pictures TEXT\
-            )\
-            ",
-            " CREATE TABLE IF NOT EXISTS ORDERS (\
-            ORDER_ID TEXT PRIMARY KEY, \
-            UID VARCHAR(255) NOT NULL,\
-            SHOP_ID VARCHAR(255) NOT NULL, \
-            ORDER_TIME TEXT NOT NULL, \
-            CURRENT_STATE INTEGER NOT NULL\
-            )\
-            ",
-            " CREATE TABLE IF NOT EXISTS ORDER_BOOK (\
-            ORDER_ID TEXT, \
-            BOOK_ID TEXT NOT NULL,\
-            PRIMARY KEY (ORDER_ID, BOOK_ID),\
-            FOREIGN KEY (ORDER_ID)\
-            REFERENCES ORDERS (ORDER_ID)\
-            ON UPDATE CASCADE ON DELETE CASCADE,\
-            FOREIGN KEY (BOOK_ID)\
-            REFERENCES BOOKS (BOOK_ID)\
-            ON UPDATE CASCADE ON DELETE CASCADE,\
-            ORDER_QUANTITY INTEGER NOT NULL\
-            )\
-            "
-        )
-        fk_commands = (
-                       "ALTER TABLE SHOPS \
-                        ADD FOREIGN KEY (UID) \
-                        REFERENCES USERS(UID); \
-                        ",
-                       "ALTER TABLE BOOKS\
-                        ADD FOREIGN KEY (SHOP_ID)\
-                        REFERENCES SHOPS(SHOP_ID);\
-                        ",
-                       "ALTER TABLE ORDERS\
-                        ADD FOREIGN KEY (UID)\
-                        REFERENCES USERS(UID),\
-                        ADD FOREIGN KEY (SHOP_ID)\
-                        REFERENCES SHOPS(SHOP_ID);\
-                        ")
         try:
             conn = self.db_connect()
             cur = conn.cursor()
-            for command in commands:
-                cur.execute(command)
-            cur.execute("SELECT\
-                        tc.constraint_name, tc.table_name, kcu.column_name, \
-                        ccu.table_name AS foreign_table_name,\
-                        ccu.column_name AS foreign_column_name \
-                        FROM \
-                        information_schema.table_constraints AS tc \
-                        JOIN information_schema.key_column_usage AS kcu\
-                        ON tc.constraint_name = kcu.constraint_name\
-                        JOIN information_schema.constraint_column_usage AS ccu\
-                        ON ccu.constraint_name = tc.constraint_name\
-                        WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='users' ")
-            if cur.rowcount == 0:
-                for command in fk_commands:
-                    cur.execute(command)
+            with open('create_table.sql', 'r') as f:
+                cur.execute(f.read())
             cur.close()
             conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -143,3 +54,6 @@ class DB_handler:
             print(error)
 
         return conn
+
+
+db_handler = DB_handler()

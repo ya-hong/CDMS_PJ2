@@ -14,10 +14,15 @@ class Shop:
     def __init__(self, shop_id) -> None:
         self.shop_id = shop_id
         self.sql = SQL()
+        if not self.sql.check('shops', shop_id):
+            raise error.NO_SHOP
 
 
     def create(user_id, shop_id):
-        SQL().insert('shops', [shop_id, user_id], "shop_id, uid")
+        sql = SQL()
+        if sql.check('shops', shop_id):
+            raise error.DUPLICATE_SHOPID
+        sql.insert('shops', [shop_id, user_id], "shop_id, uid")
         return Shop(shop_id)
 
 
@@ -31,4 +36,16 @@ class Shop:
             ))
         except Exception as error:
             pass
+
+
+    def add_book(self, book_info, quantity):
+        tags = ", ".join(['book_id', 'shop_id', 'quantity'].extend(list(book_info.keys())[1:]))
+        arr = [book_info[id], self.shop_id, int(quantity)].extend(list(book_info.values())[1:])
+        self.sql.insert("books", arr, tags)
+
+
+
+    def add_stock_level(self, book_id, offset):
+        self.sql.transaction("UPDATE books SET quantity = quantity + ? WHERE shop_id = ? AND book_id = ?;",
+                             [offset, self.shop_id, book_id])
 
