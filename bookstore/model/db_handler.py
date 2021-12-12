@@ -7,8 +7,8 @@ from configparser import ConfigParser
 class DB_handler:
     def __init__(self):
         self.section = "postgresql"
-        self.config_path = "./model/database.ini"
-        self.init_tables()
+        self.config_path = "database.ini"
+        # self.init_tables()
 
     def init_tables(self):
         commands = (
@@ -27,8 +27,9 @@ class DB_handler:
             )\
             ",
             " CREATE TABLE IF NOT EXISTS BOOKS ( \
-            BOOK_ID TEXT PRIMARY KEY, \
-            SHOP_ID VARCHAR(255) NOT NULL, \
+            BOOK_ID TEXT, \
+            SHOP_ID VARCHAR(255), \
+            PRIMARY KEY(BOOK_ID, SHOP_ID),\
             QUANTITY INTEGER NOT NULL, \
             title TEXT, \
             author TEXT, \
@@ -137,4 +138,11 @@ class DB_handler:
         return conn
 
 
-db_handler = DB_handler()
+conn = DB_handler().db_connect()
+cur = conn.cursor()
+try:
+    cur.execute("select * from shops;")
+    if cur.fetchone() is None:
+        print("YYY")
+except psycopg2.DatabaseError as e:
+    print("XXX")
