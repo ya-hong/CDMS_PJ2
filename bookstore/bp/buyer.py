@@ -11,16 +11,18 @@ bp = Blueprint('buyer', __name__, url_prefix = "/buyer")
 
 @bp.route('/new_order', methods=['POST'])
 def new_order():
-    params = request.json
-    user_id = params["user_id"]
-    store_id = params["store_id"]
-    books = params["books"] # {id, count}
-    token = request.headers["token"]
-
-    if not Token.check_token(token):
-        return error.NO_PERMISSION().ret()
+    try:
+        params = request.json
+        user_id = params["user_id"]
+        store_id = params["store_id"]
+        books = params["books"] # {id, count}
+        token = request.headers["token"]
+    except KeyError:
+        return error.INVALID_PARAMS().ret()
 
     try:
+        if not Token.check_token(user_id, token):
+            raise error.NO_PERMISSION
         user = User(user_id)
         user.new_order(Shop(store_id), books)
     except error.Err as err:
@@ -35,10 +37,13 @@ def new_order():
 #   "order_id": "order_id",
 #   "password": "password"
 def payment():
-    params = request.json
-    user_id = params['user_id']
-    order_id = params['order_id']
-    password = params['password']
+    try:
+        params = request.json
+        user_id = params['user_id']
+        order_id = params['order_id']
+        password = params['password']
+    except KeyError:
+        return error.INVALID_PARAMS().ret()
 
     try:
         user = User(user_id)
@@ -54,20 +59,22 @@ def payment():
 # "password": "password",
 # "add_value": 10
 def add_funds():
-    params = request.json
-    user_id = params['user_id']
-    password = params['password']
-    add_value = params['add_value']
-    token = request.headers["token"]
-
-    if not Token.check_token(token):
-        return error.NO_PERMISSION().ret()
-
-    
-    if add_value < 0:
-        return error.INVALID_PARAMS.ret()
+    try:
+        params = request.json
+        user_id = params['user_id']
+        password = params['password']
+        add_value = params['add_value']
+        token = request.headers["token"]
+    except KeyError:
+        return error.INVALID_PARAMS().ret()
 
     try:
+        if not Token.check_token(user_id, token):
+            raise error.NO_PERMISSION
+
+        if add_value < 0:
+            raise error.INVALID_PARAMS
+
         User(user_id).add_funds(add_value)
     except error.Err as err:
         return err.ret()

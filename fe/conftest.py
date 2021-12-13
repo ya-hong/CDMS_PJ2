@@ -1,7 +1,7 @@
 import requests
 import threading
 from urllib.parse import urljoin
-from be import serve
+from bookstore import serve
 from fe import conf
 
 thread: threading.Thread = None

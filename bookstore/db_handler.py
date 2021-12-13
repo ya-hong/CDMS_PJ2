@@ -8,11 +8,12 @@ import os
 class DB_handler:
     def __init__(self):
         self.section = "postgresql"
-        print(os.getcwd())
-        self.config_path = "bookstore/database.ini"
+        # print(os.getcwd())
+        self.config_path =  os.path.join(os.path.dirname(__file__), 'database.ini')
         self.init_tables()
 
     def init_tables(self):
+        conn = None
         try:
             conn = self.db_connect()
             cur = conn.cursor()
