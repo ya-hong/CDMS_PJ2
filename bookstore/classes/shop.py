@@ -42,6 +42,7 @@ class Shop:
         if self.sql.check("books", book_info['id']):
             raise error.DUPLICATE_BOOKID
         book_id = book_info['id']
+        book_info['tags'] = ','.join(book_info['tags'])
         del book_info['id']
         del book_info['pictures']
         tags = ['book_id', 'shop_id', 'quantity']
