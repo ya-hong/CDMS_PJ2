@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import request
-from bookstore import bp
+from bookstore.bp import auth
+from bookstore.bp import buyer
+from bookstore.bp import seller
 
 app = Flask(__name__)
 
@@ -11,9 +13,9 @@ def hello_world():
 
 
 def run_server(debug=False):
-    app.register_blueprint(bp.auth.bp)
-    app.register_blueprint(bp.buyer.bp)
-    app.register_blueprint(bp.seller.bp)
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(buyer.bp)
+    app.register_blueprint(seller.bp)
     app.run(debug = debug)
 
 

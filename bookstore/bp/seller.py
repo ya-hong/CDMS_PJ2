@@ -20,7 +20,7 @@ def create_store():
     token = request.headers["token"]
 
     if not Token.check_token(token):
-        pass
+        return error.NO_PERMISSION().ret()
     
     try:
         Shop.create(user_id, shop_id)
@@ -40,7 +40,7 @@ def add_book():
     token = request.headers["token"]
 
     if not Token.check_token(token):
-        pass
+        return error.NO_PERMISSION().ret()
     
     if quantity < 0:
         raise error.INVALID_PARAMS
@@ -62,13 +62,13 @@ def seller_add_stock_level():
     offset = int(params['add_stock_level'])
     token = request.headers["token"]
 
-    if not Token.check_token(token):
-        pass
-    
-    if offset <= 0:
-        raise error.INVALID_PARAMS
-
     try:
+        if not Token.check_token(token):
+            raise error.NO_PERMISSION
+    
+        if offset <= 0:
+            raise error.INVALID_PARAMS
+
         Shop(shop_id).add_stock_level(book_id, offset)
     except error.Err as err:
         return err.ret()

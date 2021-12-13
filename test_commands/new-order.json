@@ -2,6 +2,6 @@
     "url": "buyer/new_order",
     "user_id": "x",
     "password": "998244353",
-    "store_id": "123",
+    "store_id": "x_store",
     "books": []
 }

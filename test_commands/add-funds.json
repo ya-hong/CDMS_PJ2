@@ -1,0 +1,7 @@
+
+{
+    "url": "buyer/add_funds",
+    "user_id": "x",
+    "password": "password",
+    "add_value": 10
+}
