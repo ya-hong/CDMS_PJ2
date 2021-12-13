@@ -45,4 +45,4 @@ def add_token(user_id, password, terminal):
     if not user_id in tokens:
         tokens[user_id] = []
     tokens[user_id].append(code)
-
+    return code
