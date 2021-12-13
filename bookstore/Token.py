@@ -15,7 +15,7 @@ def encode(t, user_id, password):
 
 
 def clear():
-    for token in tokens:
+    for token in tokens[:]:
         t, user_id, password = decode(token)
         if time.time() - t > 60:
             tokens.remove(token)
@@ -33,5 +33,5 @@ def check_token(token):
 
 def add_token(user_id, password):
     clear()
-    tokens.append(time.time(), user_id, password)
+    tokens.append(encode(time.time(), user_id, password))
 
