@@ -17,7 +17,7 @@ def new_order():
     books = params["books"] # {id, count}
     token = request.headers["token"]
 
-    if not Token.check_token(token):
+    if not Token.check_token(user_id, token):
         return error.NO_PERMISSION().ret()
 
     try:
@@ -60,7 +60,7 @@ def add_funds():
     add_value = params['add_value']
     token = request.headers["token"]
 
-    if not Token.check_token(token):
+    if not Token.check_token(user_id, token):
         return error.NO_PERMISSION().ret()
 
     

@@ -22,7 +22,7 @@ def create_store():
     shop_id = params['store_id']
     token = request.headers["token"]
 
-    if not Token.check_token(token):
+    if not Token.check_token(user_id, token):
         return error.NO_PERMISSION().ret()
     
     try:
@@ -42,7 +42,7 @@ def add_book():
     quantity = int(params['stock_level'])
     token = request.headers["token"]
 
-    if not Token.check_token(token):
+    if not Token.check_token(user_id, token):
         return error.NO_PERMISSION().ret()
     
     if quantity < 0:
@@ -58,7 +58,7 @@ def add_book():
 @bp.route("/add_stock_level", methods=['POST'])
 def seller_add_stock_level():
     params = request.json
-    # uid = params['user_id']
+    user_id = params['user_id']
     # password = params['password']
     shop_id = params['store_id']
     book_id = params['book_id']
@@ -66,7 +66,7 @@ def seller_add_stock_level():
     token = request.headers["token"]
 
     try:
-        if not Token.check_token(token):
+        if not Token.check_token(user_id, token):
             raise error.NO_PERMISSION
     
         if offset <= 0:
