@@ -39,17 +39,26 @@ class Shop:
 
 
     def add_book(self, book_info, quantity):
-        if self.sql.check("books", book_info['id']):
+        if len(self.sql.transaction("SELECT * FROM books WHERE book_id = %s AND shop_id = %s", [book_info['id'], self.shop_id])):
             raise error.DUPLICATE_BOOKID
+
         book_id = book_info['id']
         book_info['tags'] = ','.join(book_info['tags'])
         del book_info['id']
         del book_info['pictures']
+
+        for (key, value) in list(book_info.items()):
+            if value == '' or value == None:
+                del book_info[key]
+
         tags = ['book_id', 'shop_id', 'quantity']
         tags.extend(list(book_info.keys()))
         arr = [book_id, self.shop_id, int(quantity)]
         arr.extend(list(book_info.values()))
         tags = ", ".join(tags)
+
+        print("!!! add_book!", book_id, self.shop_id, quantity)
+
         self.sql.insert("books", arr, tags)
 
 

@@ -57,6 +57,7 @@ def login():
         return error.NO_PERMISSION({'message': '用户名不存在'}).ret()
     except error.Err as err:
         return err.ret()
+
     return error.OK({'message': 'OK', 'token': token}).ret()
 
 
