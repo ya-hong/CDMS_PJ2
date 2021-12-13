@@ -11,6 +11,9 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello World'
 
+@app.route('/shutdown')
+def shutdown():
+    return be_shutdown()
 
 def run_server(debug=False):
     app.register_blueprint(auth.bp)

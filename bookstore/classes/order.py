@@ -21,9 +21,10 @@ class Order:
         sql = SQL()
         sql.insert('orders', [order_id, user_id, shop_id, str(time.time()), 0])
         for book in books:
-            (book_id, order_quantity) = book
-            sql.insert('order_book', [order_id, book_id, order_quantity])
-        return Order(shop_id)
+            book_id = book['id']
+            count = int(book['count'])
+            sql.insert('order_book', [order_id, book_id, count])
+        return Order(order_id)
 
 
     def fetch(self):
