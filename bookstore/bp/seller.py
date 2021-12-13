@@ -16,11 +16,15 @@ bp = Blueprint('seller', __name__, url_prefix = "/seller")
 # "password": "password",
 # "store_id": "shop_id"
 def create_store():
-    params = request.json
-    user_id = params['user_id']
-    # password = params['password']
-    shop_id = params['store_id']
-    token = request.headers["token"]
+    try:
+        params = request.json
+        user_id = params['user_id']
+        # password = params['password']
+        shop_id = params['store_id']
+        token = request.headers["token"]
+    except KeyError:
+        return error.INVALID_PARAMS().ret()
+
 
     if not Token.check_token(user_id, token):
         return error.NO_PERMISSION().ret()
@@ -34,13 +38,17 @@ def create_store():
 
 @bp.route("/add_book", methods=['POST'])
 def add_book():
-    params = request.json
-    user_id = params['user_id']
-    # password = params['password']
-    shop_id = params['store_id']
-    book_info = params['book_info']
-    quantity = int(params['stock_level'])
-    token = request.headers["token"]
+    try:
+        params = request.json
+        user_id = params['user_id']
+        # password = params['password']
+        shop_id = params['store_id']
+        book_info = params['book_info']
+        quantity = int(params['stock_level'])
+        token = request.headers["token"]
+    except KeyError:
+        return error.INVALID_PARAMS().ret()
+
 
     if not Token.check_token(user_id, token):
         return error.NO_PERMISSION().ret()
@@ -57,13 +65,17 @@ def add_book():
 
 @bp.route("/add_stock_level", methods=['POST'])
 def seller_add_stock_level():
-    params = request.json
-    user_id = params['user_id']
-    # password = params['password']
-    shop_id = params['store_id']
-    book_id = params['book_id']
-    offset = int(params['add_stock_level'])
-    token = request.headers["token"]
+    try:
+        params = request.json
+        user_id = params['user_id']
+        # password = params['password']
+        shop_id = params['store_id']
+        book_id = params['book_id']
+        offset = int(params['add_stock_level'])
+        token = request.headers["token"]
+    except KeyError:
+        return error.INVALID_PARAMS().ret()
+
 
     try:
         if not Token.check_token(user_id, token):
