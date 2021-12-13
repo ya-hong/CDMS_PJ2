@@ -35,7 +35,7 @@ def create_store():
 @bp.route("/add_book", methods=['POST'])
 def add_book():
     params = request.json
-    # uid = params['user_id']
+    user_id = params['user_id']
     # password = params['password']
     shop_id = params['store_id']
     book_info = params['book_info']
