@@ -12,9 +12,6 @@ bp = Blueprint('seller', __name__, url_prefix = "/seller")
 
 
 @bp.route("/create_store", methods=['POST'])
-# "user_id": "user_id",
-# "password": "password",
-# "store_id": "shop_id"
 def create_store():
     params = request.json
     user_id = params['user_id']
