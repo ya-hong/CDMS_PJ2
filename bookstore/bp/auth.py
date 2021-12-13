@@ -2,59 +2,62 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flask import session
-from bookstore.model.auth import *
+from bookstore.classes.model import *
+from bookstore import error
+from bookstore import Token
 import random
 
 
-bp = Blueprint('auth', __name__, url_prefix="/auth")
+bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@bp.route('/register', methods = ['POST'])
+@bp.route('/register', methods=['POST'])
 def register():
     params = request.json
-    user_id = params["user_id"]
-    password = params["password"]
-    user = User()
-    if user.register(user_id, password):
-        code = 200
-        body = {"message": "OK"}
-    else:
-        code = 500
-        body = {"message": "用户名重复，注册失败！"}
-    return jsonify(body), code
+    user_id = params['user_id']
+    password = params['password']
+
+    try:
+        User.create(user_id, password)
+    except error.Err as err:
+        # print(err)
+        return err.ret()
+
+    return error.ok.ret()
 
 
 @bp.route('/unregister', methods=['POST'])
 def unregister():
     params = request.json
-    user_id = params["user_id"]
-    password = params["password"]
-    user = User()
-    if user.unregister(user_id, password):
-        code = 200
-        body = {"message": "OK"}
-    else:
-        code = 401
-        body = {"message": "注销失败，用户名不存在或密码不正确"}
-    return jsonify(body), code
+    user_id = params['user_id']
+    password = params['password']
+
+    try:
+        user = User(user_id)
+        user.unregister(password)
+    except error.NO_USER:
+        return error.NO_PERMISSION({'message': '用户名不存在'}).ret()
+    except error.Err as err:
+        return err.ret()
+    return error.ok.ret()
 
 
-@bp.route('/login', methods=['POST', 'GET'])
+@bp.route('/login', methods=['POST'])
 def login():
     params = request.json
-    user_id = params["user_id"]
-    password = params["password"]
-    terminal = ''.join(str(random.choice(range(10))) for _ in range(10))
-    user = User()
-    token = user.login(user_id, password, terminal)
-    session["token"] = token
-    if token is not None:
-        code = 200
-        body = {"message": "OK", "token": token}
-    else:
-        code = 401
-        body = {"message": "登录失败，用户名或密码错误"}
-    return jsonify(body), code
+    user_id = params['user_id']
+    password = params['password']
+    terminal = params['terminal']
+    # token = None
+    try:
+        user = User(user_id)
+        user.login(password, terminal)
+        token = Token.add_token(user_id, password, terminal)
+    except error.NO_USER:
+        return error.NO_PERMISSION({'message': '用户名不存在'}).ret()
+    except error.Err as err:
+        return err.ret()
+    return error.OK({'message': 'OK', 'token': token}).ret()
 
 
 @bp.route("/password", methods=["POST"])
@@ -63,14 +66,15 @@ def password():
     user_id = params["user_id"]
     old_password = params["oldPassword"]
     new_password = params["newPassword"]
-    user = User()
-    if user.password(user_id, old_password, new_password):
-        code = 200
-        body = {"message": "OK"}
-    else:
-        code = 401
-        body = {"message": "更改密码失败"}
-    return jsonify(body), code
+
+    try:
+        user = User(user_id)
+        user.password(old_password, new_password)
+    except error.NO_USER:
+        return error.NO_PERMISSION({'message': '用户名不存在'}).ret()
+    except error.Err as err:
+        return err.ret()
+    return error.ok.ret()
 
 
 @bp.route('/logout', methods=['POST'])
@@ -78,11 +82,11 @@ def logout():
     params = request.json
     user_id = params["user_id"]
     token = request.headers.get("token")
-    user = User()
-    if user.logout(user_id):
-        code = 200
-        body = {"message": "登出成功"}
-    else:
-        code = 401
-        body = {"message": "登出失败，用户名或token错误"}
-    return jsonify(body), code
+    if not Token.check_token(user_id, token):
+        return error.NO_PERMISSION({'message': 'token错误'}).ret()
+    try:
+        user = User(user_id)
+        user.logout()
+    except error.NO_USER:
+        return error.NO_PERMISSION({'message': '用户名错误'}).ret()
+    return error.ok.ret()

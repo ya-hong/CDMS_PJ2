@@ -14,7 +14,7 @@ def new_order():
     params = request.json
     user_id = params["user_id"]
     store_id = params["store_id"]
-    books = params["books"] # {id, count}
+    books = params["books"]     # {id, count}
     # token = request.headers["token"]
 
     # if not Token.check_token(token):

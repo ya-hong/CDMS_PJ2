@@ -12,7 +12,7 @@ class Err(Exception):
     code = 501
     msg = "未知错误"
 
-    def __init__(self, dic = {}) -> None:
+    def __init__(self, dic={}) -> None:
         self.message = {
             'message': self.msg
         } 
@@ -27,21 +27,26 @@ class OK(Err):
     code = 200
     msg = 'ok'
 
+
 class INVENTORY_SHORTAGE(Err):
     code = 502
     msg = "库存不足"
+
 
 class NO_USER(Err):
     code = 503
     msg = '用户ID不存在'
 
+
 class NO_BUYER(Err):
     code = 504
     msg = '买家用户ID不存在'
 
+
 class NO_SELLER(Err):
     code = 505
     msg = '卖家用户ID不存在'
+
 
 class INVALID_PARAMS(Err):
     code = 506

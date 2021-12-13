@@ -13,7 +13,6 @@
 3. sql.check(table, id) # 查询表table中是否有主键为id的数据
 """
 
-
 from bookstore.db_handler import DB_handler
 import psycopg2
 
@@ -25,20 +24,20 @@ ID = {
     'order_book': 'book_id',
 }
 
+
 def get_id(table):
     return ID[table.lower()]
+
 
 class SQL:
     def __init__(self) -> None:
         self.conn = DB_handler().db_connect()
 
-
     def __del__(self):
         self.conn.commit()
         self.conn.close()
-    
 
-    def transaction(self, str = None, arg = []):
+    def transaction(self, str=None, arg=[]):
         if str is None:
             return self.conn
         if str[-1] != ';':
@@ -47,13 +46,14 @@ class SQL:
             ret = self.execute(str, arg)
             return ret
 
-
-    def execute(self, str, arg = []):
+    def execute(self, str, arg=[]):
         try:
             cur = self.conn.cursor()
             cur.execute(str, tuple(arg))
             if str.split()[0].lower() == 'select':
                 ret = cur.fetchall()
+            elif str.split()[0].lower() == 'delete' or str.split()[0].lower() == 'update':
+                ret = cur.rowcount
             else:
                 ret = True
         except Exception as error:
@@ -63,8 +63,7 @@ class SQL:
         else:
             return ret
 
-
-    def insert(self, table, arr, tags = ""):
+    def insert(self, table, arr, tags=""):
         values = ""
         for v in arr:
             if isinstance(v, str):
@@ -80,7 +79,6 @@ class SQL:
         ret = self.transaction("INSERT INTO {} {} VALUES({});".format(table, tags, values))
         return ret
 
-
     def find_by_id(self, table, id):
         try:
             ret = self.transaction("SELECT * FROM {} WHERE {} = %s;".format(table, ID[table]), [id])
@@ -92,7 +90,6 @@ class SQL:
             print("find_by_id 错误")
             print(err)
             return err
-
 
     def check(self, table, id):
         try:
