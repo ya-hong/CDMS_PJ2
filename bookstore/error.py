@@ -4,7 +4,7 @@ post接口返回 Err().ret() 即可返回错误。
 若要生成特定的错误描述，使用Err({'message':'xxx'})
 """
 
-from flask import jsonify
+from flask import jsonify, make_response
 from bookstore import classes
 
 
@@ -20,7 +20,7 @@ class Err(Exception):
         super().__init__(self.msg)
 
     def ret(self):
-        return jsonify(self.message), self.code 
+        return make_response(jsonify(self.message), self.code) 
 
 
 class OK(Err):

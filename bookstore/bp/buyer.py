@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask import request
 from bookstore import error
 from bookstore import Token
+from bookstore.bp.auth import password
 from bookstore.classes.model import *
 from bookstore.classes.sql import SQL
 
@@ -24,12 +25,12 @@ def new_order():
         if not Token.check_token(user_id, token):
             raise error.NO_PERMISSION
         user = User(user_id)
-        user.new_order(Shop(store_id), books)
+        order = user.new_order(Shop(store_id), books)
     except error.Err as err:
         print(err)
         return err.ret()
 
-    return error.ok.ret()
+    return error.OK({'order_id': order.order_id}).ret()
 
 
 @bp.route('/payment', methods = ['POST'])
@@ -47,9 +48,10 @@ def payment():
 
     try:
         user = User(user_id)
-        if user.password != password:
+        user.fetch()
+        if user.pwd != password:
             raise error.NO_PERMISSION
-        User(user_id).payment(Order(order_id))
+        user.payment(Order(order_id))
     except error.Err as err:
         return err.ret()
     return error.ok.ret()
@@ -62,19 +64,23 @@ def add_funds():
     try:
         params = request.json
         user_id = params['user_id']
-        password = params['password']
         add_value = params['add_value']
-        token = request.headers["token"]
+        password = params['password']
+        # token = request.headers["token"]
     except KeyError:
         return error.INVALID_PARAMS().ret()
 
     try:
-        if not Token.check_token(user_id, token):
+        # if not Token.check_token(user_id, token):
+        #     raise error.NO_PERMISSION
+
+        # if add_value < 0:
+        #     print()
+        #     raise error.INVALID_PARAMS
+        user = User(user_id)
+        user.fetch()
+        if password != user.pwd:
             raise error.NO_PERMISSION
-
-        if add_value < 0:
-            raise error.INVALID_PARAMS
-
         User(user_id).add_funds(add_value)
     except error.Err as err:
         return err.ret()

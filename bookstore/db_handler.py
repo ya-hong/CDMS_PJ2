@@ -8,8 +8,8 @@ import os
 class DB_handler:
     def __init__(self):
         self.section = "postgresql"
-        print(os.getcwd())
-        self.config_path = "./database.ini"
+        # print(os.getcwd())
+        self.config_path =  os.path.join(os.path.dirname(__file__), 'database.ini')
         self.init_tables()
 
     def init_tables(self):
@@ -26,7 +26,7 @@ class DB_handler:
         finally:
             if conn is not None:
                 conn.close()
-            print('Database connection closed.')
+            # print('Database connection closed.')
 
     def config(self):
         parser = ConfigParser()
@@ -48,7 +48,7 @@ class DB_handler:
             params = self.config()
 
             conn = psycopg2.connect(**params)
-            print("Successfully connected.")
+            # print("Successfully connected.")
 
         except (Exception, psycopg2.DatabaseError) as error:
             print("Failed to connect.")

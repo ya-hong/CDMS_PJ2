@@ -13,13 +13,13 @@ def decode(s):
 def encode(t, user_id, password, terminal):
     t = int(time.time())
     s = "{}-{}-{}".format(user_id, password, terminal)
-    s = "{}-{}".format(t, sha256(s))
+    print("!!!!s", s)
+    s = "{}-{}".format(t, sha256(s.encode('utf-8')).hexdigest())
     return s
 
 
 def clear():
-    items = tokens.items()
-    for key, value in items:
+    for (key, value) in list(tokens.items()):
         for token in value[:]:
             t = decode(token)
             if time.time() - t > 60:
