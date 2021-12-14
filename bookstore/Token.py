@@ -13,7 +13,7 @@ def decode(s):
 def encode(t, user_id, password, terminal):
     t = int(time.time())
     s = "{}-{}-{}".format(user_id, password, terminal)
-    print("!!!!s", s)
+    # print("!!!!s", s)
     s = "{}-{}".format(t, sha256(s.encode('utf-8')).hexdigest())
     return s
 
@@ -41,7 +41,7 @@ def check_token(user_id, token):
 def add_token(user_id, password, terminal):
     clear()
     code = encode(time.time(), user_id, password, terminal)
-    print("生成token", code)
+    # print("生成token", code)
     if not user_id in tokens:
         tokens[user_id] = []
     tokens[user_id].append(code)

@@ -20,7 +20,7 @@ sql = SQL()
 # ret = sql.transaction("SELECT * FROM shops;")
 # print(ret)
 
-ret = sql.transaction("SELECT quantity FROM books where book_id = '1000067' AND shop_id = 'test_new_order_store_id_70c84e5a-5c15-11ec-a0a3-00155db1fd38';")
+ret = sql.transaction("SELECT quantity FROM books where book_id = '1000067' AND shop_id = 'test_new_order_store_id_70c84e5a-5c15-11ec-a0a3-00155db1fd38' AND (shop_id = '1');")
 print(ret)
 
 # ret = sql.transaction("SELECT * FROM order_book;")

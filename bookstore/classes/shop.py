@@ -57,7 +57,7 @@ class Shop:
         arr.extend(list(book_info.values()))
         tags = ", ".join(tags)
 
-        print("!!! add_book!", book_id, self.shop_id, quantity)
+        # print("!!! add_book!", book_id, self.shop_id, quantity)
 
         self.sql.insert("books", arr, tags)
 
