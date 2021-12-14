@@ -49,6 +49,8 @@ class SQL:
     def execute(self, str, arg=[]):
         try:
             cur = self.conn.cursor()
+            print('str', str)
+            print('arg', tuple(arg))
             cur.execute(str, tuple(arg))
             if str.split()[0].lower() == 'select':
                 ret = cur.fetchall()

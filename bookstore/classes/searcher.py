@@ -7,7 +7,7 @@ def gen_query(table, query):
     for terms in query:
         s = []
         for term in terms:
-            s.append("{} LIKE {}".format(table, term))
+            s.append("{} LIKE '%%{}%%'".format(table, term))
         if len(s):
             q.append("({})".format(' AND '.join(s)))
     if len(q):
@@ -27,7 +27,7 @@ def search(page, title = [], tags = [], content = [], shop_id = None):
         if q != None:
             querys.append(q)
     if shop_id:
-        querys.append("shop_id = {}".format(shop_id))
+        querys.append("shop_id = '{}'".format(shop_id))
     query = ' AND '.join(querys)
     ret = sql.transaction("SELECT book_id, shop_id FROM books WHERE " 
         + query 
