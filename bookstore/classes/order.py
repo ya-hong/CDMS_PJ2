@@ -1,5 +1,5 @@
 from bookstore.classes.sql import SQL
-from bookstore import error
+from bookstore.error import OrderState
 import time
 
 
@@ -17,7 +17,7 @@ class Order:
 
     def create(order_id, user_id, shop_id, books):
         sql = SQL()
-        sql.insert('orders', [order_id, user_id, shop_id, str(time.time()), 0])
+        sql.insert('orders', [order_id, user_id, shop_id, str(time.time()), OrderState.UNPAID.value[0]])
         for book in books:
             book_id = book['id']
             count = int(book['count'])
@@ -33,10 +33,9 @@ class Order:
                 [ret[i][0] for i in range(len(ret))],
                 [ret[i][1] for i in range(len(ret))]
             ))
-        except Exception as error:
+        except Exception as e:
             pass
 
     def pay(self):
         with self.sql.transaction():
-            self.sql.execute("DELETE FROM orders WHERE order_id = %s", [self.order_id])
-            self.sql.execute("DELETE FROM order_book WHERE order_id = %s", [self.order_id])
+            self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s", [OrderState.UNDELIVERED.value[0], self.order_id])
