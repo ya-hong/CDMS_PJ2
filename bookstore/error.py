@@ -11,13 +11,12 @@ from enum import Enum
 
 class OrderState(Enum):
     UNPAID = 0,
-    PAID = 1,
-    UNDELIVERED = 2,
-    DELIVERED = 3,
-    COMPLETED = 4,
-    AUTO_CANCEL = 5,
-    BUYER_CANCEL = 6
-    
+    UNDELIVERED = 1,
+    DELIVERED = 2,
+    COMPLETED = 3,
+    AUTO_CANCEL = 4,
+    BUYER_CANCEL = 5
+
 
 class Err(Exception):
     code = 501
