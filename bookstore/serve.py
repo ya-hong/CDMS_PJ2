@@ -1,8 +1,9 @@
 from flask import Flask
 from flask import request
-from bookstore.bp import auth
-from bookstore.bp import buyer
-from bookstore.bp import seller
+from bookstore.bp import auth, buyer, seller, extra
+import waitress
+
+from bookstore.bp.extra import search 
 
 app = Flask(__name__)
 
@@ -19,7 +20,8 @@ def run_server(debug=False):
     app.register_blueprint(auth.bp)
     app.register_blueprint(buyer.bp)
     app.register_blueprint(seller.bp)
-    app.run(debug = debug)
+    app.register_blueprint(extra.bp)
+    app.run(debug = debug, threaded=True)
 
 
 def shutdown_server():

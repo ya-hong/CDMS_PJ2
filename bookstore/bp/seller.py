@@ -22,7 +22,6 @@ def create_store():
     except KeyError:
         return error.INVALID_PARAMS().ret()
 
-
     if not Token.check_token(user_id, token):
         return error.NO_PERMISSION().ret()
     
@@ -45,7 +44,6 @@ def add_book():
         token = request.headers["token"]
     except KeyError:
         return error.INVALID_PARAMS().ret()
-
 
     if not Token.check_token(user_id, token):
         return error.NO_PERMISSION().ret()
@@ -72,7 +70,6 @@ def seller_add_stock_level():
         token = request.headers["token"]
     except KeyError:
         return error.INVALID_PARAMS().ret()
-
 
     try:
         if not Token.check_token(user_id, token):

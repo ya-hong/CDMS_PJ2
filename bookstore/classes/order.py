@@ -1,4 +1,3 @@
-from werkzeug.datastructures import FileStorage
 from bookstore.classes.sql import SQL
 from bookstore import error
 import time
@@ -16,7 +15,6 @@ class Order:
         self.order_id = order_id
         self.sql = SQL()
 
-
     def create(order_id, user_id, shop_id, books):
         sql = SQL()
         sql.insert('orders', [order_id, user_id, shop_id, str(time.time()), 0])
@@ -25,7 +23,6 @@ class Order:
             count = int(book['count'])
             sql.insert('order_book', [order_id, book_id, count])
         return Order(order_id)
-
 
     def fetch(self):
         try:
@@ -38,7 +35,6 @@ class Order:
             ))
         except Exception as error:
             pass
-
 
     def pay(self):
         with self.sql.transaction():

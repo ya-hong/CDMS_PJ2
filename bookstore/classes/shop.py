@@ -3,8 +3,6 @@ from bookstore.classes.sql import SQL
 from bookstore import error
 
 
-
-
 class Shop:
     """
     shop_id, user_id, ranking
@@ -17,14 +15,12 @@ class Shop:
         if not self.sql.check('shops', shop_id):
             raise error.NO_SHOP
 
-
     def create(user_id, shop_id):
         sql = SQL()
         if sql.check('shops', shop_id):
             raise error.DUPLICATE_SHOPID
         sql.insert('shops', [shop_id, user_id], "shop_id, uid")
         return Shop(shop_id)
-
 
     def fetch(self):
         try:
@@ -37,9 +33,9 @@ class Shop:
         except Exception as error:
             pass
 
-
     def add_book(self, book_info, quantity):
-        if len(self.sql.transaction("SELECT * FROM books WHERE book_id = %s AND shop_id = %s", [book_info['id'], self.shop_id])):
+        if len(self.sql.transaction("SELECT * FROM books WHERE book_id = %s AND shop_id = %s",
+                                    [book_info['id'], self.shop_id])):
             raise error.DUPLICATE_BOOKID
 
         book_id = book_info['id']
@@ -57,15 +53,12 @@ class Shop:
         arr.extend(list(book_info.values()))
         tags = ", ".join(tags)
 
-        print("!!! add_book!", book_id, self.shop_id, quantity)
+        # print("!!! add_book!", book_id, self.shop_id, quantity)
 
         self.sql.insert("books", arr, tags)
-
-
 
     def add_stock_level(self, book_id, offset):
         if not self.sql.check("books", book_id):
             raise error.NO_BOOK
         self.sql.transaction("UPDATE books SET quantity = quantity + %s WHERE shop_id = %s AND book_id = %s;",
                              [offset, self.shop_id, book_id])
-
