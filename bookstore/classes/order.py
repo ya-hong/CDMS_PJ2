@@ -1,4 +1,3 @@
-from werkzeug.datastructures import FileStorage
 from bookstore.classes.sql import SQL
 from bookstore import error
 import time

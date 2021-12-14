@@ -2,9 +2,7 @@ from flask import Blueprint
 from flask import request
 from bookstore import error
 from bookstore import Token
-from bookstore.bp.auth import password
 from bookstore.classes.model import *
-from bookstore.classes.sql import SQL
 
 bp = Blueprint('buyer', __name__, url_prefix="/buyer")
 
