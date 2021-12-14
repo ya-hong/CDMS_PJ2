@@ -6,6 +6,16 @@ post接口返回 Err().ret() 即可返回错误。
 
 from flask import jsonify, make_response
 from bookstore import classes
+from enum import Enum
+
+
+class OrderState(Enum):
+    UNPAID = 0,
+    UNDELIVERED = 1,
+    DELIVERED = 2,
+    COMPLETED = 3,
+    AUTO_CANCEL = 4,
+    BUYER_CANCEL = 5
 
 
 class Err(Exception):
