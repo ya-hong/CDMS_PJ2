@@ -6,8 +6,7 @@ from bookstore.bp.auth import password
 from bookstore.classes.model import *
 from bookstore.classes.sql import SQL
 
-
-bp = Blueprint('buyer', __name__, url_prefix = "/buyer")
+bp = Blueprint('buyer', __name__, url_prefix="/buyer")
 
 
 @bp.route('/new_order', methods=['POST'])
@@ -16,7 +15,7 @@ def new_order():
         params = request.json
         user_id = params["user_id"]
         store_id = params["store_id"]
-        books = params["books"] # {id, count}
+        books = params["books"]  # {id, count}
         token = request.headers["token"]
     except KeyError:
         return error.INVALID_PARAMS().ret()
@@ -33,7 +32,7 @@ def new_order():
     return error.OK({'order_id': order.order_id}).ret()
 
 
-@bp.route('/payment', methods = ['POST'])
+@bp.route('/payment', methods=['POST'])
 #   "user_id": "buyer_id",
 #   "order_id": "order_id",
 #   "password": "password"
@@ -56,7 +55,8 @@ def payment():
         return err.ret()
     return error.ok.ret()
 
-@bp.route("/add_funds", methods = ["POST"])
+
+@bp.route("/add_funds", methods=["POST"])
 # "user_id": "user_id",
 # "password": "password",
 # "add_value": 10
