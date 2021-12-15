@@ -3,9 +3,7 @@ from flask import Blueprint
 from flask import request
 from bookstore import error
 from bookstore import Token
-from bookstore.classes import shop, user
 from bookstore.classes.model import *
-from bookstore.classes.sql import SQL
 
 
 bp = Blueprint('seller', __name__, url_prefix = "/seller")
@@ -82,3 +80,9 @@ def seller_add_stock_level():
     except error.Err as err:
         return err.ret()
     return error.ok.ret()
+
+
+@bp.route("/delivery", methods=['POST'])
+def seller_delivery():
+    order_id = request.json['order_id']
+    deliver_thread = orderThread

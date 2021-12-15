@@ -3,7 +3,7 @@ import time
 from bookstore.classes.order import Order
 from bookstore.db_handler import DB_handler
 from bookstore.classes.sql import SQL
-from bookstore.error import OrderState
+from bookstore import error
 
 
 sleep_time = 10
@@ -32,21 +32,22 @@ class orderThread(threading.Thread):
         to_del_info = [(i[0], i[2]) for i in ret][:to_del_num]
         for order_id, shop_id in to_del_info:
             self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s",
-                                    [str(OrderState.AUTO_CANCEL.value[0]), order_id])
+                                    [str(error.OrderState.AUTO_CANCEL.value[0]), order_id])
             ret = self.sql.transaction("SELECT book_id, order_quantity FROM order_book WHERE order_id = %s", [order_id])
             for (book_id, quantity) in ret:
                 self.sql.transaction("UPDATE book SET QUANTITY = QUANTITY + %s WHERE shop_id = %s AND book_id = %s",
                                     [quantity, shop_id, book_id])
         threading.Lock.release()
 
-    def deliver(self):
+    def deliver(self, order_id):
         threading.Lock.acquire()
-        ret = self.sql.transaction("SELECT order_id FROM orders WHERE current_state = %s;", [OrderState.UNDELIVERED.value[0]])
-        if ret is None:
-            return
+        ret = self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s",
+                                   [order_id, str(error.OrderState.UNDELIVERED.value[0])])
+        if ret == 0:
+            raise
         for order_id in [i[0] for i in ret]:
             self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s",
-                                    [str(OrderState.DELIVERED.value[0]), order_id])
+                                    [str(error.OrderState.DELIVERED.value[0]), order_id])
         threading.Lock.release()
 
     def run(self):
