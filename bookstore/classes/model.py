@@ -7,3 +7,4 @@
 from bookstore.classes.user import User
 from bookstore.classes.shop import Shop
 from bookstore.classes.order import Order
+from bookstore.classes.thread import orderThread

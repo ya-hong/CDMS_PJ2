@@ -83,3 +83,17 @@ def add_funds():
     except error.Err as err:
         return err.ret()
     return error.ok.ret()
+
+
+@bp.route("/delivery", methods=["POST"])
+def buyer_delivery():
+    params = request.json
+    user_id = params['user_id']
+    password = params['password']
+    order_id = params['order_id']
+    try:
+        user = User(user_id)
+        user.receipt(order_id, password)
+    except error.Err as err:
+        return err.ret()
+    return error.ok.ret()

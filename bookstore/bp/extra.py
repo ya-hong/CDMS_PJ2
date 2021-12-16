@@ -9,7 +9,6 @@ from pprint import pprint
 bp = Blueprint('extra', __name__, url_prefix = "/extra")
 
 
-
 @bp.route('/search', methods=['POST'])
 def search():
     try:

@@ -3,9 +3,7 @@ from flask import Blueprint
 from flask import request
 from bookstore import error
 from bookstore import Token
-from bookstore.classes import shop, user
 from bookstore.classes.model import *
-from bookstore.classes.sql import SQL
 
 
 bp = Blueprint('seller', __name__, url_prefix = "/seller")
@@ -79,6 +77,20 @@ def seller_add_stock_level():
             raise error.INVALID_PARAMS
 
         Shop(shop_id).add_stock_level(book_id, offset)
+    except error.Err as err:
+        return err.ret()
+    return error.ok.ret()
+
+
+@bp.route("/delivery", methods=['POST'])
+def seller_delivery():
+    params = request.json
+    user_id = params['user_id']
+    shop_id = params['shop_id']
+    order_id = params['order_id']
+    try:
+        user = User(user_id)
+        user.delivery(shop_id, order_id)
     except error.Err as err:
         return err.ret()
     return error.ok.ret()

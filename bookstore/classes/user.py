@@ -64,7 +64,6 @@ class User:
         ret = self.sql.transaction("SELECT order_id FROM orders WHERE uid = %s", [self.user_id])
         self.orders = [Order(ret[i][0]) for i in range(len(ret))]
 
-
     def new_order(self, shop: Shop, books):
         with self.sql.transaction():
             order_id = str(uuid.uuid1())
@@ -81,13 +80,12 @@ class User:
         order = Order.create(order_id, self.user_id, shop.shop_id, books)
         return order
 
-
     def payment(self, order: Order):
         self.fetch()
         print('uid', self.user_id, 'order_id', order.order_id)
         with self.sql.transaction():
             if len(self.sql.execute("SELECT * FROM orders WHERE uid = %s AND order_id = %s",
-                    [self.user_id, order.order_id])) == 0:
+                                    [self.user_id, order.order_id])) == 0:
                 print("无订单")
                 raise error.INVALID_PARAMS
             ret = self.sql.execute(
@@ -103,6 +101,28 @@ class User:
             self.sql.execute('UPDATE users SET balance = balance - %s WHERE uid = %s;', [price, self.user_id])
             order.pay()
 
-
     def add_funds(self, funds):
         self.sql.transaction("UPDATE users SET balance = balance + %s WHERE uid = %s;", [funds, self.user_id])
+
+    def receipt(self, order_id,  password):
+        self.fetch()
+        if order_id in self.orders and password == self.pwd:
+            ret = self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s and current_state = %s",
+                                   [error.OrderState.COMPLETED.value[0], order_id, error.OrderState.DELIVERED.value[0]])
+            if ret == 0:
+                raise error.INVALID_PARAMS({'message': '订单号有误'})
+        else:
+            if order_id not in self.orders:
+                raise error.INVALID_PARAMS({'message': '订单号有误'})
+            elif password != self.pwd:
+                raise error.NO_PERMISSION({'message': '密码有误，授权失败'})
+
+    def delivery(self, shop_id, order_id):
+        self.fetch()
+        if shop_id in self.shops:
+            ret = self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s and current_state = %s",
+                                   [error.OrderState.DELIVERED.value[0], order_id, error.OrderState.UNDELIVERED.value[0]])
+            if ret == 0:
+                raise error.INVALID_PARAMS
+        else:
+            raise error.NO_PERMISSION({'message': '权限不足'})
