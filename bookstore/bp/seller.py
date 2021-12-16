@@ -84,5 +84,13 @@ def seller_add_stock_level():
 
 @bp.route("/delivery", methods=['POST'])
 def seller_delivery():
-    order_id = request.json['order_id']
-    deliver_thread = orderThread
+    params = request.json
+    user_id = params['user_id']
+    shop_id = params['shop_id']
+    order_id = params['order_id']
+    try:
+        user = User(user_id)
+        user.delivery(shop_id, order_id)
+    except error.Err as err:
+        return err.ret()
+    return error.ok.ret()

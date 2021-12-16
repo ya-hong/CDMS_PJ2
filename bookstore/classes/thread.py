@@ -39,28 +39,28 @@ class orderThread(threading.Thread):
                                     [quantity, shop_id, book_id])
         threading.Lock.release()
 
-    def deliver(self, order_id):
-        threading.Lock.acquire()
-        ret = self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s",
-                                   [order_id, str(error.OrderState.UNDELIVERED.value[0])])
-        if ret == 0:
-            raise
-        for order_id in [i[0] for i in ret]:
-            self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s",
-                                    [str(error.OrderState.DELIVERED.value[0]), order_id])
-        threading.Lock.release()
-
+    # def deliver(self, order_id):
+    #     threading.Lock.acquire()
+    #     ret = self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s",
+    #                                [order_id, str(error.OrderState.UNDELIVERED.value[0])])
+    #     if ret == 0:
+    #         raise
+    #     for order_id in [i[0] for i in ret]:
+    #         self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s",
+    #                                 [str(error.OrderState.DELIVERED.value[0]), order_id])
+    #     threading.Lock.release()
+    #
     def run(self):
         while True:
             if self.option == 1:
                 self.time_check()
-            else:
-                self.deliver()
+            # else:
+            #     self.deliver()
             time.sleep(sleep_time)
 
 
 if __name__ == "__main__":
     thread_auto_cancel = orderThread(1)
-    thread_deliver = orderThread(2)
+    # thread_deliver = orderThread(2)
     thread_auto_cancel.start()
-    thread_deliver.start()
+    # thread_deliver.start()

@@ -68,12 +68,16 @@ POST http://$address$​/seller/delivery
 
 ```json
 {
+    "user_id": "$seller_id$",
+    "shop_id": "$shop_id$",
     "order_id": "$order_id$"
 }
 ```
 
 | 变量名   | 类型   | 描述   | 是否可为空 |
 | -------- | ------ | ------ | ---------- |
+| user_id | string | 卖家id | N           |
+| shop_id | string | 商店id | N           |
 | order_id | string | 订单号 | N          |
 
 #### Response
@@ -83,7 +87,8 @@ Status Code:
 | 码   | 描述                     |
 | ---- | ------------------------ |
 | 200  | 成功发货                 |
-| 506  | 参数错误（订单号不存在） |
+| 506  | 参数错误（订单号不存在或商店id错误） |
+| 401  | 无相应权限（卖家id有误） |
 
 ##### Body:
 

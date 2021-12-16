@@ -116,3 +116,13 @@ class User:
                 raise error.INVALID_PARAMS({'message': '订单号有误'})
             elif password != self.pwd:
                 raise error.NO_PERMISSION({'message': '密码有误，授权失败'})
+
+    def delivery(self, shop_id, order_id):
+        self.fetch()
+        if shop_id in self.shops:
+            ret = self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s and current_state = %s",
+                                   [error.OrderState.DELIVERED.value[0], order_id, error.OrderState.UNDELIVERED.value[0]])
+            if ret == 0:
+                raise error.INVALID_PARAMS
+        else:
+            raise error.NO_PERMISSION({'message': '权限不足'})
