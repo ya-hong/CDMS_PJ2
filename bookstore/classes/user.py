@@ -4,6 +4,7 @@ from bookstore import error
 from bookstore.classes.order import Order
 from bookstore.classes.shop import Shop
 import uuid
+from bookstore.error import OrderState
 
 
 class User:
@@ -82,21 +83,16 @@ class User:
 
     def payment(self, order: Order):
         self.fetch()
-        print('uid', self.user_id, 'order_id', order.order_id)
+        orders = [self.orders[i].order_id for i in range(len(self.orders))]
+        if not order.order_id in orders:
+            raise error.INVALID_PARAMS({'message': "订单不存在"})
+        order.fetch()
+
         with self.sql.transaction():
-            if len(self.sql.execute("SELECT * FROM orders WHERE uid = %s AND order_id = %s",
-                                    [self.user_id, order.order_id])) == 0:
-                raise error.INVALID_PARAMS
-            ret = self.sql.execute(
-                """SELECT SUM(order_quantity * price) 
-                FROM order_book 
-                    JOIN orders ON order_book.order_id = orders.order_id
-                    JOIN books ON (orders.shop_id = books.shop_id AND order_book.book_id = books.book_id) 
-                WHERE orders.order_id = %s;""", [order.order_id])
-            price = 0 if ret[0][0] is None else ret[0][0]
-            if price > self.balance:
+            if order.price > self.balance:
                 raise error.INSUFFICIENT_BALANCE
-            self.sql.execute('UPDATE users SET balance = balance - %s WHERE uid = %s;', [price, self.user_id])
+            self.sql.execute('UPDATE users SET balance = balance - %s WHERE uid = %s;', 
+                [order.price, self.user_id])
             order.pay()
 
     def add_funds(self, funds):
@@ -133,7 +129,6 @@ class User:
         else:
             raise error.NO_PERMISSION({'message': '权限不足'})
 
-
     def history(self):
         self.fetch()
         orders = []
@@ -144,3 +139,15 @@ class User:
                 'state': order.current_state
             })
         return orders
+
+    def cancel(self, order:Order):
+        self.fetch()
+        orders = [self.orders[i].order_id for i in range(len(self.orders))]
+        if not order.order_id in orders:
+            raise error.INVALID_PARAMS({'message': '订单ID不存在'})
+        order.fetch()
+        if not order.current_state in [OrderState.UNPAID, OrderState.UNDELIVERED]:
+            raise error.CANT_CANCEL
+        if order.current_state != OrderState.UNPAID:
+            self.add_funds(order.price)
+        order.cancel()

@@ -102,5 +102,9 @@ class DUPLICATE_BOOKID(Err):
     code = 513
     msg = '图书ID已存在'
 
+class CANT_CANCEL(Err):
+    code = 514
+    msg = '已经无法取消'
+
 
 ok = OK()

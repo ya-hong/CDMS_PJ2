@@ -1,3 +1,4 @@
+from bookstore.classes.shop import Shop
 from bookstore.classes.sql import SQL
 from bookstore.error import OrderState
 import time
@@ -7,7 +8,8 @@ class Order:
     """
     order_id, 
     user_id, shop_id, (买家id， 卖家商店id)
-    books[(book_id, count)]  
+    books[(book_id, count)]
+    price
     ORDER_TIME, CURRENT_STATE
     """
 
@@ -33,9 +35,24 @@ class Order:
                 [ret[i][0] for i in range(len(ret))],
                 [ret[i][1] for i in range(len(ret))]
             ))
+            ret = self.sql.execute(
+                """SELECT SUM(order_quantity * price) 
+                FROM order_book 
+                    JOIN orders ON order_book.order_id = orders.order_id
+                    JOIN books ON (orders.shop_id = books.shop_id AND order_book.book_id = books.book_id) 
+                WHERE orders.order_id = %s;""", [self.order_id])
+            self.price = 0 if ret[0][0] is None else ret[0][0]
         except Exception as e:
             print(e)
 
     def pay(self):
         with self.sql.transaction():
             self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s", [OrderState.UNDELIVERED.value[0], self.order_id])
+
+    def cancel(self, auto_cancel = False):
+        code = OrderState.BUYER_CANCEL if not auto_cancel else OrderState.AUTO_CANCEL
+        self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s", [code, self.order_id])
+        self.fetch()
+        shop = Shop(self.shop_id)
+        for (book_id, count) in self.books:
+            shop.add_stock_level(book_id, count)
