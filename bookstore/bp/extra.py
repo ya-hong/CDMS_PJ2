@@ -5,6 +5,8 @@ from bookstore import Token
 from bookstore.classes import searcher
 from pprint import pprint
 
+from bookstore.classes.user import User
+
 
 bp = Blueprint('extra', __name__, url_prefix = "/extra")
 
@@ -29,3 +31,23 @@ def search():
         print(err)
         return err.ret()
     return error.OK({'books': ret}).ret()
+
+
+@bp.route('/history', methods=['POST'])
+def history():
+    try:
+        params = request.json
+        user_id = params['user_id']
+        token = request.headers["token"]
+    except KeyError:
+        return error.INVALID_PARAMS().ret()
+    
+    if not Token.check_token(user_id, token):
+        return error.NO_PERMISSION().ret()
+
+    try:
+        user = User(user_id)
+        orders = user.history()
+    except error.Err as err:
+        return err.ret()
+    return error.OK({'orders': orders}).ret()

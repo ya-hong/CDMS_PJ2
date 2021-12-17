@@ -91,6 +91,8 @@ def seller_delivery():
     try:
         user = User(user_id)
         user.delivery(shop_id, order_id)
+    except error.NO_USER as err:
+        return error.NO_PERMISSION().ret()
     except error.Err as err:
         return err.ret()
     return error.ok.ret()

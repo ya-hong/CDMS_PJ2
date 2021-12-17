@@ -86,7 +86,6 @@ class User:
         with self.sql.transaction():
             if len(self.sql.execute("SELECT * FROM orders WHERE uid = %s AND order_id = %s",
                                     [self.user_id, order.order_id])) == 0:
-                print("无订单")
                 raise error.INVALID_PARAMS
             ret = self.sql.execute(
                 """SELECT SUM(order_quantity * price) 
@@ -94,7 +93,6 @@ class User:
                     JOIN orders ON order_book.order_id = orders.order_id
                     JOIN books ON (orders.shop_id = books.shop_id AND order_book.book_id = books.book_id) 
                 WHERE orders.order_id = %s;""", [order.order_id])
-            print('ret', ret, 'balance', self.balance)
             price = 0 if ret[0][0] is None else ret[0][0]
             if price > self.balance:
                 raise error.INSUFFICIENT_BALANCE
@@ -119,10 +117,30 @@ class User:
 
     def delivery(self, shop_id, order_id):
         self.fetch()
-        if shop_id in self.shops:
+        flag = False
+        for shop in self.shops:
+            if shop_id == shop.shop_id:
+                flag = True
+                break
+        if flag:
+            ret = self.sql.execute("SELECT * FROM orders WHERE order_id = %s", [order_id])
+            print('status', ret)
             ret = self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s and current_state = %s",
                                    [error.OrderState.DELIVERED.value[0], order_id, error.OrderState.UNDELIVERED.value[0]])
+            print("return ", ret)
             if ret == 0:
                 raise error.INVALID_PARAMS
         else:
             raise error.NO_PERMISSION({'message': '权限不足'})
+
+
+    def history(self):
+        self.fetch()
+        orders = []
+        for order in self.orders:
+            order.fetch()
+            orders.append[{
+                'order_id': order.order_id,
+                'state': order.current_state
+            }]
+        return orders

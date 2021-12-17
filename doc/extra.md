@@ -270,3 +270,58 @@ Status Code:
 | 变量名  | 类型   | 描述                           | 是否可为空 |
 | ------- | ------ | ------------------------------ | ---------- |
 | message | string | 错误信息，成功取消订单则返回ok | N          |
+
+
+## 查看历史订单
+
+#### URL
+
+POST http://[address]/extra/history
+
+
+#### Request
+
+Headers:
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+token | string | 登录产生的会话标识 | N
+
+Body:
+
+```json
+{
+  "user_id": "$buyer id$",
+}
+```
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+user_id | string | 买家用户ID | N
+
+
+#### Response
+
+Status Code:
+
+码 | 描述
+--- | ---
+200 | 登出成功
+401 | 用户名或token错误
+
+Body:
+
+```
+{
+    "orders": [
+        {
+            "order_id": "id",
+            "state": "订单状态",
+        }
+    ]
+}
+```
+
+变量名 | 类型 | 描述 | 是否可为空
+---|---|---|---
+orders | string | 返回历史订单id以及状态 | N

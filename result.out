@@ -2,68 +2,75 @@
 platform linux -- Python 3.8.10, pytest-6.2.5, py-1.11.0, pluggy-1.0.0 -- /usr/bin/python3
 cachedir: .pytest_cache
 rootdir: /home/yanghong/Projects/SQLProject
+plugins: parallel-0.1.1
 collecting ... frontend begin test
  * Serving Flask app 'bookstore.serve' (lazy loading)
  * Environment: production
    WARNING: This is a development server. Do not use it in a production deployment.
    Use a production WSGI server instead.
  * Debug mode: off
-collected 33 items
+collected 36 items
 
-fe/test/test_add_book.py::TestAddBook::test_ok PASSED                    [  3%]
-fe/test/test_add_book.py::TestAddBook::test_error_non_exist_store_id PASSED [  6%]
-fe/test/test_add_book.py::TestAddBook::test_error_exist_book_id PASSED   [  9%]
-fe/test/test_add_book.py::TestAddBook::test_error_non_exist_user_id PASSED [ 12%]
-fe/test/test_add_funds.py::TestAddFunds::test_ok PASSED                  [ 15%]
-fe/test/test_add_funds.py::TestAddFunds::test_error_user_id PASSED       [ 18%]
-fe/test/test_add_funds.py::TestAddFunds::test_error_password PASSED      [ 21%]
-fe/test/test_add_stock_level.py::TestAddStockLevel::test_error_user_id PASSED [ 24%]
-fe/test/test_add_stock_level.py::TestAddStockLevel::test_error_store_id PASSED [ 27%]
-fe/test/test_add_stock_level.py::TestAddStockLevel::test_error_book_id PASSED [ 30%]
-fe/test/test_add_stock_level.py::TestAddStockLevel::test_ok PASSED       [ 33%]
-fe/test/test_bench.py::test_bench PASSED                                 [ 36%]
-fe/test/test_create_store.py::TestCreateStore::test_ok PASSED            [ 39%]
-fe/test/test_create_store.py::TestCreateStore::test_error_exist_store_id PASSED [ 42%]
-fe/test/test_login.py::TestLogin::test_ok PASSED                         [ 45%]
-fe/test/test_login.py::TestLogin::test_error_user_id PASSED              [ 48%]
-fe/test/test_login.py::TestLogin::test_error_password PASSED             [ 51%]
-fe/test/test_new_order.py::TestNewOrder::test_non_exist_book_id PASSED   [ 54%]
-fe/test/test_new_order.py::TestNewOrder::test_low_stock_level PASSED     [ 57%]
-fe/test/test_new_order.py::TestNewOrder::test_ok PASSED                  [ 60%]
-fe/test/test_new_order.py::TestNewOrder::test_non_exist_user_id PASSED   [ 63%]
-fe/test/test_new_order.py::TestNewOrder::test_non_exist_store_id PASSED  [ 66%]
-fe/test/test_password.py::TestPassword::test_ok PASSED                   [ 69%]
-fe/test/test_password.py::TestPassword::test_error_password PASSED       [ 72%]
-fe/test/test_password.py::TestPassword::test_error_user_id PASSED        [ 75%]
-fe/test/test_payment.py::TestPayment::test_ok PASSED                     [ 78%]
-fe/test/test_payment.py::TestPayment::test_authorization_error PASSED    [ 81%]
-fe/test/test_payment.py::TestPayment::test_not_suff_funds PASSED         [ 84%]
-fe/test/test_payment.py::TestPayment::test_repeat_pay PASSED             [ 87%]
-fe/test/test_register.py::TestRegister::test_register_ok PASSED          [ 90%]
-fe/test/test_register.py::TestRegister::test_unregister_ok PASSED        [ 93%]
-fe/test/test_register.py::TestRegister::test_unregister_error_authorization PASSED [ 96%]
+fe/test/test_add_book.py::TestAddBook::test_ok PASSED                    [  2%]
+fe/test/test_add_book.py::TestAddBook::test_error_non_exist_store_id PASSED [  5%]
+fe/test/test_add_book.py::TestAddBook::test_error_exist_book_id PASSED   [  8%]
+fe/test/test_add_book.py::TestAddBook::test_error_non_exist_user_id PASSED [ 11%]
+fe/test/test_add_funds.py::TestAddFunds::test_ok PASSED                  [ 13%]
+fe/test/test_add_funds.py::TestAddFunds::test_error_user_id PASSED       [ 16%]
+fe/test/test_add_funds.py::TestAddFunds::test_error_password PASSED      [ 19%]
+fe/test/test_add_stock_level.py::TestAddStockLevel::test_error_user_id PASSED [ 22%]
+fe/test/test_add_stock_level.py::TestAddStockLevel::test_error_store_id PASSED [ 25%]
+fe/test/test_add_stock_level.py::TestAddStockLevel::test_error_book_id PASSED [ 27%]
+fe/test/test_add_stock_level.py::TestAddStockLevel::test_ok PASSED       [ 30%]
+fe/test/test_create_store.py::TestCreateStore::test_ok PASSED            [ 33%]
+fe/test/test_create_store.py::TestCreateStore::test_error_exist_store_id PASSED [ 36%]
+fe/test/test_extra.py::TestDelivery::test_ok PASSED                      [ 38%]
+fe/test/test_extra.py::TestDelivery::test_no_permission PASSED           [ 41%]
+fe/test/test_extra.py::TestDelivery::test_no_order PASSED                [ 44%]
+fe/test/test_extra.py::TestDelivery::test_no_store PASSED                [ 47%]
+fe/test/test_login.py::TestLogin::test_ok PASSED                         [ 50%]
+fe/test/test_login.py::TestLogin::test_error_user_id PASSED              [ 52%]
+fe/test/test_login.py::TestLogin::test_error_password PASSED             [ 55%]
+fe/test/test_new_order.py::TestNewOrder::test_non_exist_book_id PASSED   [ 58%]
+fe/test/test_new_order.py::TestNewOrder::test_low_stock_level PASSED     [ 61%]
+fe/test/test_new_order.py::TestNewOrder::test_ok PASSED                  [ 63%]
+fe/test/test_new_order.py::TestNewOrder::test_non_exist_user_id PASSED   [ 66%]
+fe/test/test_new_order.py::TestNewOrder::test_non_exist_store_id PASSED  [ 69%]
+fe/test/test_password.py::TestPassword::test_ok PASSED                   [ 72%]
+fe/test/test_password.py::TestPassword::test_error_password PASSED       [ 75%]
+fe/test/test_password.py::TestPassword::test_error_user_id PASSED        [ 77%]
+fe/test/test_payment.py::TestPayment::test_ok PASSED                     [ 80%]
+fe/test/test_payment.py::TestPayment::test_authorization_error PASSED    [ 83%]
+fe/test/test_payment.py::TestPayment::test_not_suff_funds PASSED         [ 86%]
+fe/test/test_payment.py::TestPayment::test_repeat_pay PASSED             [ 88%]
+fe/test/test_register.py::TestRegister::test_register_ok PASSED          [ 91%]
+fe/test/test_register.py::TestRegister::test_unregister_ok PASSED        [ 94%]
+fe/test/test_register.py::TestRegister::test_unregister_error_authorization PASSED [ 97%]
 fe/test/test_register.py::TestRegister::test_register_error_exist_user_id PASSED [100%]
 
-======================== 33 passed in 121.66s (0:02:01) ========================
+============================= 36 passed in 25.30s ==============================
 frontend end test
 No data to combine
 Name                              Stmts   Miss Branch BrPart  Cover
 -------------------------------------------------------------------
-bookstore/Token.py                   35      0     12      0   100%
+bookstore/Token.py                   33      2     12      4    87%
 bookstore/__init__.py                 0      0      0      0   100%
 bookstore/bp/__init__.py              0      0      0      0   100%
 bookstore/bp/auth.py                 74      2      8      0    98%
-bookstore/bp/buyer.py                63      6      6      0    91%
-bookstore/bp/seller.py               65      9     10      3    84%
+bookstore/bp/buyer.py                73     16      6      0    80%
+bookstore/bp/extra.py                26     17      0      0    35%
+bookstore/bp/seller.py               77      9     12      3    87%
 bookstore/classes/__init__.py         0      0      0      0   100%
-bookstore/classes/model.py            3      0      0      0   100%
-bookstore/classes/order.py           27      6      6      0    76%
-bookstore/classes/shop.py            43      6     16      0    86%
+bookstore/classes/model.py            4      0      0      0   100%
+bookstore/classes/order.py           25      6      6      0    74%
+bookstore/classes/searcher.py        29     25     16      0     9%
+bookstore/classes/shop.py            42      6     16      0    86%
 bookstore/classes/sql.py             63     12     20      0    86%
-bookstore/classes/user.py            74      0     24      0   100%
+bookstore/classes/thread.py          38     26     19      1    26%
+bookstore/classes/user.py            97     10     40      1    86%
 bookstore/db_handler.py              41      6      8      2    84%
-bookstore/error.py                   53      0     30      0   100%
-bookstore/serve.py                   30      3      4      2    85%
+bookstore/error.py                   61      0     32      0   100%
+bookstore/serve.py                   31      3      4      2    86%
 fe/__init__.py                        0      0      0      0   100%
 fe/access/__init__.py                 0      0      0      0   100%
 fe/access/auth.py                    31      0      2      0   100%
@@ -71,24 +78,24 @@ fe/access/book.py                    70      1     16      2    97%
 fe/access/buyer.py                   36      0      4      0   100%
 fe/access/new_buyer.py                8      0      0      0   100%
 fe/access/new_seller.py               8      0      0      0   100%
-fe/access/seller.py                  31      0      2      0   100%
+fe/access/seller.py                  37      0      2      0   100%
 fe/bench/__init__.py                  0      0      0      0   100%
-fe/bench/run.py                      13      0      6      0   100%
-fe/bench/session.py                  47      0     14      1    98%
-fe/bench/workload.py                125      1     28      2    98%
+fe/bench/run.py                      13     13      6      0     0%
+fe/bench/session.py                  47     47     14      0     0%
+fe/bench/workload.py                125    125     28      0     0%
 fe/conf.py                           11      0      0      0   100%
 fe/conftest.py                       17      0      0      0   100%
-fe/test/gen_book_data.py             48      0     18      0   100%
+fe/test/gen_book_data.py             48      1     18      1    97%
 fe/test/test_add_book.py             36      0     12      0   100%
 fe/test/test_add_funds.py            23      0      2      0   100%
 fe/test/test_add_stock_level.py      39      0     12      0   100%
-fe/test/test_bench.py                 6      2      0      0    67%
 fe/test/test_create_store.py         20      0      2      0   100%
+fe/test/test_extra.py                46      1      6      1    96%
 fe/test/test_login.py                28      0      2      0   100%
 fe/test/test_new_order.py            40      0      2      0   100%
 fe/test/test_password.py             33      0      2      0   100%
 fe/test/test_payment.py              60      1      6      1    97%
 fe/test/test_register.py             31      0      2      0   100%
 -------------------------------------------------------------------
-TOTAL                              1332     55    276     13    96%
+TOTAL                              1521    329    337     18    76%
 Wrote HTML report to htmlcov/index.html
