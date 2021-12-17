@@ -15,7 +15,6 @@ bp = Blueprint('extra', __name__, url_prefix = "/extra")
 def search():
     try:
         params = request.json
-        print(params)
         title = params.get('title') or []
         tags = params.get("tags") or []
         content = params.get("content") or []

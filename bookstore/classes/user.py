@@ -124,10 +124,10 @@ class User:
                 break
         if flag:
             ret = self.sql.execute("SELECT * FROM orders WHERE order_id = %s", [order_id])
-            print('status', ret)
+            # print('status', ret)
             ret = self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s and current_state = %s",
                                    [error.OrderState.DELIVERED.value[0], order_id, error.OrderState.UNDELIVERED.value[0]])
-            print("return ", ret)
+            # print("return ", ret)
             if ret == 0:
                 raise error.INVALID_PARAMS
         else:
@@ -139,8 +139,8 @@ class User:
         orders = []
         for order in self.orders:
             order.fetch()
-            orders.append[{
+            orders.append({
                 'order_id': order.order_id,
                 'state': order.current_state
-            }]
+            })
         return orders

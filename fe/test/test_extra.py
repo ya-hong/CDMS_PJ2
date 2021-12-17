@@ -65,3 +65,40 @@ class TestDelivery:
         code = self.seller.delivery(self.seller_id, self.store_id + '1', self.order_id)
         assert(code != 200)
 
+
+
+class TestHistory:
+    @pytest.fixture(autouse=True)
+    def pre_run_initialization(self):
+        # do before test
+        
+        ## gen seller
+        self.seller_id = "test_extra_seller_id_{}".format(str(uuid.uuid1()))
+        self.store_id = "test_extra_store_id_{}".format(str(uuid.uuid1()))
+        self.seller_password = self.seller_id
+        self.gen_book = GenBook(self.seller_id, self.store_id)
+        self.seller = self.gen_book.seller
+        
+        ## gen buyer
+        self.buyer_id = "test_extra_buyer_id_{}".format(str(uuid.uuid1()))
+        self.buyer_password = self.buyer_id + '_pwd'
+        self.buyer = register_new_buyer(self.buyer_id, self.buyer_password)
+
+        ## gen order 
+        ok, buy_book_id_list = self.gen_book.gen(non_exist_book_id=False, low_stock_level=False)
+        assert(ok)
+        self.buy_book_info_list = self.gen_book.buy_book_info_list
+        code, self.order_id = self.buyer.new_order(self.store_id, buy_book_id_list)
+        assert(code == 200)
+
+        yield
+        # do after test
+
+    def test_ok(self):
+        code, orders = self.buyer.history(self.buyer.user_id)
+        assert code == 200
+        assert(self.order_id == orders[0]['order_id'])
+
+    def test_no_permission(self):
+        code, _ = self.buyer.history(self.buyer.user_id + '1')
+        assert code == 401

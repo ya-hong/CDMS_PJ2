@@ -2,6 +2,7 @@ import requests
 import simplejson
 from urllib.parse import urljoin
 from fe.access.auth import Auth
+from fe import conf
 
 
 class Buyer:
@@ -40,3 +41,10 @@ class Buyer:
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
         return r.status_code
+
+    def history(self, user_id):
+        url = urljoin(conf.URL, 'extra/history')
+        json = {"user_id": user_id}
+        headers = {"token": self.token}
+        r = requests.post(url, json = json, headers = headers)
+        return r.status_code, r.json().get('orders')
