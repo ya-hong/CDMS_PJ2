@@ -57,7 +57,7 @@ def add_book():
 
 
 @bp.route("/add_stock_level", methods=['POST'])
-def seller_add_stock_level():
+def add_stock_level():
     try:
         params = request.json
         user_id = params['user_id']
