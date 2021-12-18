@@ -3,6 +3,7 @@ from bookstore.classes.shop import Shop
 from bookstore.classes.sql import SQL
 from bookstore.error import OrderState
 import time
+from bookstore.classes.thread import orderThread
 
 
 class Order:
@@ -21,6 +22,8 @@ class Order:
     def create(order_id, user_id, shop_id, books):
         sql = SQL()
         sql.insert('orders', [order_id, user_id, shop_id, str(time.time()), OrderState.UNPAID.value[0]])
+        thread = orderThread(order_id)
+        thread.run()
         for book in books:
             book_id = book['id']
             count = int(book['count'])
