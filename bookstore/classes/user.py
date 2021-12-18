@@ -67,7 +67,6 @@ class User:
 
     def new_order(self, shop: Shop, books):
         with self.sql.transaction():
-            order_id = str(uuid.uuid1())
             for book in books:
                 book_id = book['id']
                 count = int(book['count'])
@@ -78,6 +77,7 @@ class User:
                 else:
                     self.sql.execute("UPDATE books SET quantity=quantity-%s WHERE shop_id=%s AND book_id=%s",
                                      [count, shop.shop_id, book_id])
+        order_id = str(uuid.uuid1())
         order = Order.create(order_id, self.user_id, shop.shop_id, books)
         return order
 
@@ -141,9 +141,8 @@ class User:
         return orders
 
     def cancel(self, order:Order):
-        self.fetch()
-        orders = [self.orders[i].order_id for i in range(len(self.orders))]
-        if not order.order_id in orders:
+        if len(self.sql.transaction("SELECT * FROM orders WHERE order_id = %s AND uid = %s;",
+                                    [order.order_id, self.user_id])) == 0:
             raise error.INVALID_PARAMS({'message': '订单ID不存在'})
         order.fetch()
         if not order.current_state in [OrderState.UNPAID, OrderState.UNDELIVERED]:

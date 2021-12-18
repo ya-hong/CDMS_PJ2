@@ -79,7 +79,7 @@ def add_funds():
         user.fetch()
         if password != user.pwd:
             raise error.NO_PERMISSION
-        User(user_id).add_funds(add_value)
+        user.add_funds(add_value)
     except error.Err as err:
         return err.ret()
     return error.ok.ret()
