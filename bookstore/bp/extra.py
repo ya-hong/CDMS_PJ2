@@ -1,3 +1,4 @@
+from configparser import Error
 from flask import Blueprint
 from flask import request
 from bookstore import error
@@ -5,6 +6,7 @@ from bookstore import Token
 from bookstore.classes import searcher
 from bookstore.classes.model import *
 from pprint import pprint
+from bookstore.classes.order import Order
 
 from bookstore.classes.user import User
 

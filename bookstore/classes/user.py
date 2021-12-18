@@ -145,8 +145,9 @@ class User:
                                     [order.order_id, self.user_id])) == 0:
             raise error.INVALID_PARAMS({'message': '订单ID不存在'})
         order.fetch()
-        if not order.current_state in [OrderState.UNPAID, OrderState.UNDELIVERED]:
+        if not order.current_state in [OrderState.UNPAID.value[0], OrderState.UNDELIVERED.value[0]]:
+            print('订单状态', order.current_state)
             raise error.CANT_CANCEL
-        if order.current_state != OrderState.UNPAID:
+        if order.current_state != OrderState.UNPAID.value[0]:
             self.add_funds(order.price)
         order.cancel()

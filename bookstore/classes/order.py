@@ -1,3 +1,4 @@
+from enum import auto
 from bookstore.classes.shop import Shop
 from bookstore.classes.sql import SQL
 from bookstore.error import OrderState
@@ -9,7 +10,7 @@ class Order:
     """
     order_id, 
     user_id, shop_id, (买家id， 卖家商店id)
-    books[(book_id, count)]
+    books[book_id -> count]
     price
     ORDER_TIME, CURRENT_STATE
     """
@@ -53,9 +54,13 @@ class Order:
             self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s", [OrderState.UNDELIVERED.value[0], self.order_id])
 
     def cancel(self, auto_cancel = False):
-        code = OrderState.BUYER_CANCEL if not auto_cancel else OrderState.AUTO_CANCEL
+        if auto_cancel:
+            code = OrderState.AUTO_CANCEL.value
+        else:
+            code = OrderState.BUYER_CANCEL.value 
+        print('code', code)
         self.sql.transaction("UPDATE orders SET current_state = %s WHERE order_id = %s", [code, self.order_id])
         self.fetch()
         shop = Shop(self.shop_id)
-        for (book_id, count) in self.books:
+        for (book_id, count) in self.books.items():
             shop.add_stock_level(book_id, count)
