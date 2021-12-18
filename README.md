@@ -7,7 +7,7 @@ pip install psycopg2
 ```
 
 ### Config
-```bookstore/model/```目录下的database.ini文件是连接数据库所需的配置参数，内容如下：
+```bookstore/```目录下的database.ini文件是连接数据库所需的配置参数，内容如下：
 ```editorconfig
 [postgresql]
 host=localhost
