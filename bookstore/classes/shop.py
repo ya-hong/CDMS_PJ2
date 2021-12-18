@@ -58,7 +58,8 @@ class Shop:
         self.sql.insert("books", arr, tags)
 
     def add_stock_level(self, book_id, offset):
-        if not self.sql.check("books", book_id):
+        if len(self.sql.transaction("SELECT * FROM books WHERE book_id = %s AND shop_id = %s;",
+                                    [book_id, self.shop_id])) == 0:
             raise error.NO_BOOK
         self.sql.transaction("UPDATE books SET quantity = quantity + %s WHERE shop_id = %s AND book_id = %s;",
                              [offset, self.shop_id, book_id])
