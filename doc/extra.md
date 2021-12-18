@@ -64,6 +64,14 @@ POST http://$address$​/seller/delivery
 
 #### Request
 
+
+##### Header:
+
+key | 类型 | 描述 | 是否可为空
+---|---|---|---
+token | string | 登录产生的会话标识 | N
+
+
 ##### Body:
 
 ```json
@@ -226,7 +234,7 @@ orders数组：
 
 #### URL：
 
-POST http://$address$​/buyer/cancel_order
+POST http://$address$​/extra/cancel_order
 
 #### Request
 
@@ -256,6 +264,8 @@ Status Code:
 | ---- | -------------------------------- |
 | 200  | 成功取消订单                     |
 | 401  | 授权失败（用户不存在或密码有误） |
+| 5XX | 无此订单 |
+| 5XX | 无法取消 (已发货或已取消) | 
 
 ##### Body:
 

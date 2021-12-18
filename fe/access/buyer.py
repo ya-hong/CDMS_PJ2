@@ -1,3 +1,4 @@
+from flask import json
 import requests
 import simplejson
 from urllib.parse import urljoin
@@ -48,3 +49,11 @@ class Buyer:
         headers = {"token": self.token}
         r = requests.post(url, json = json, headers = headers)
         return r.status_code, r.json().get('orders')
+
+    def cancel_order(self, order_id):
+        url = urljoin(conf.URL, 'extra/cancel_order')
+        json = {"user_id": self.user_id, "password": self.password, "order_id": order_id}
+        headers = {"token": self.token}
+        r = requests.post(url, headers=headers, json=json)
+        # print(r.json().get('message'))
+        return r.status_code

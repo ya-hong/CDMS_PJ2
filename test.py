@@ -13,6 +13,5 @@ from bookstore.classes.sql import SQL
 # except error.INVALID_PARAMS as err:
 #     print(err)
 
-sql = SQL()
-ret = sql.transaction("""SELECT title FROM books WHERE content LIKE '%%，%%';""")
-print(ret)
+x = ((11))
+print(x)

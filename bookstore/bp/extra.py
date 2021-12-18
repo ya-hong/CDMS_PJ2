@@ -1,9 +1,11 @@
+from configparser import Error
 from flask import Blueprint
 from flask import request
 from bookstore import error
 from bookstore import Token
 from bookstore.classes import searcher
 from pprint import pprint
+from bookstore.classes.order import Order
 
 from bookstore.classes.user import User
 
@@ -50,3 +52,24 @@ def history():
     except error.Err as err:
         return err.ret()
     return error.OK({'orders': orders}).ret()
+
+
+
+@bp.route('/cancel_order', methods=['POST'])
+def cancel_order():
+    try:
+        params = request.json
+        user_id = params['user_id']
+        order_id = params['order_id']
+        password = params['password']
+    except KeyError:
+        return error.INVALID_PARAMS().ret()
+    try:
+        user = User(user_id)
+        user.fetch()
+        if user.pwd != password:
+            raise error.NO_PERMISSION({'message': "密码错误"})
+        user.cancel(Order(order_id))
+    except error.Err as err:
+        return err.ret()
+    return error.ok.ret()
