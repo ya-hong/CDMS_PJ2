@@ -77,6 +77,7 @@ token | string | 登录产生的会话标识 | N
 ```json
 {
     "user_id": "$seller_id$",
+    "password": "$password$",
     "shop_id": "$shop_id$",
     "order_id": "$order_id$"
 }
@@ -85,6 +86,7 @@ token | string | 登录产生的会话标识 | N
 | 变量名   | 类型   | 描述   | 是否可为空 |
 | -------- | ------ | ------ | ---------- |
 | user_id | string | 卖家id | N           |
+| password | string | 密码 | N           |
 | shop_id | string | 商店id | N           |
 | order_id | string | 订单号 | N          |
 
