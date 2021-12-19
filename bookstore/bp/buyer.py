@@ -93,6 +93,9 @@ def buyer_delivery():
     order_id = params['order_id']
     try:
         user = User(user_id)
+        user.fetch()
+        if password != user.pwd:
+            raise error.NO_PERMISSION
         user.receipt(order_id, password)
     except error.Err as err:
         return err.ret()
