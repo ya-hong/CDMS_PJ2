@@ -13,7 +13,7 @@ POST http://[address]/extra/search
     "tags": [[]],
     "content": [[]],
     "shop_id": "shop_id",
-    "page_num": "page_num"
+    "page_num": 1
 }
 ```
 

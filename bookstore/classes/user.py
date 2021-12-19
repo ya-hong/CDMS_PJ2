@@ -100,7 +100,8 @@ class User:
 
     def receipt(self, order_id,  password):
         self.fetch()
-        if order_id in self.orders and password == self.pwd:
+        orders = [order.order_id for order in self.orders]
+        if order_id in orders and password == self.pwd:
             ret = self.sql.execute("UPDATE orders SET current_state = %s WHERE order_id = %s and current_state = %s",
                                    [error.OrderState.COMPLETED.value[0], order_id, error.OrderState.DELIVERED.value[0]])
             if ret == 0:

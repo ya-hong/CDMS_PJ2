@@ -83,7 +83,7 @@ class SQL:
 
     def find_by_id(self, table, id):
         try:
-            ret = self.transaction("SELECT * FROM {} WHERE {} = %s;".format(table, ID[table]), [id])
+            ret = self.transaction("SELECT * FROM {} WHERE {} = %s;".format(table, get_id(table)), [id])
             if len(ret):
                 return ret[0]
             else:

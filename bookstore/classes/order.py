@@ -23,7 +23,7 @@ class Order:
         sql = SQL()
         sql.insert('orders', [order_id, user_id, shop_id, str(time.time()), OrderState.UNPAID.value[0]])
         thread = orderThread(order_id)
-        thread.run()
+        thread.start()
         for book in books:
             book_id = book['id']
             count = int(book['count'])

@@ -1,5 +1,6 @@
 from flask import json
 import requests
+from requests.api import head
 import simplejson
 from urllib.parse import urljoin
 from fe.access.auth import Auth
@@ -56,4 +57,22 @@ class Buyer:
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
         # print(r.json().get('message'))
+        return r.status_code
+
+    def search(self, s):
+        url = urljoin(conf.URL, 'extra/search')
+        json = s
+        headers = {"token": self.token}
+        r = requests.post(url, json=json, headers=headers)
+        return r.status_code
+
+    def delivery(self, order_id):
+        url = urljoin(self.url_prefix, 'delivery')
+        json = {
+            "user_id": self.user_id, 
+            "password": self.password,
+            "order_id": order_id
+        }
+        headers = {"token": self.token}
+        r =requests.post(url, json = json, headers=headers)
         return r.status_code
